@@ -1,9 +1,18 @@
 **NovaUI v1.0.0 — API Reference with Examples**
 
-A modern, spring-animated UI library for Roblox (client-side). Put the module in a `ModuleScript` named `NovaUI` (e.g. in `ReplicatedStorage`) and require it from a `LocalScript`:
+Licensed under the MIT License.
+
+A modern, spring-animated UI library for Roblox (client-side) and Exploits. For Studio = Put the module in a `ModuleScript` named `NovaUI` (e.g. in `ReplicatedStorage`) and require it from a `LocalScript`:
+
 
 ```lua
 local Nova = require(game:GetService("ReplicatedStorage"):WaitForChild("NovaUI"))
+```
+
+For Exploits = Put this at the top of your code, and use the variable exactly like the Roblox Studio version.
+
+```lua
+local Nova = loadstring(game:HttpGet("https://e"))()
 ```
 
 All GUIs are created lazily and parented to `PlayerGui`; requiring the module draws nothing until you build something.

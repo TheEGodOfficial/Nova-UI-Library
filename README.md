@@ -34,10 +34,18 @@
 
 ## Installation
 
+**Option A — ModuleScript (studio / game scripts)**
+
 Place the contents of `NovaUI.lua` inside a `ModuleScript` (e.g. in `ReplicatedStorage`) then require it:
 
 ```lua
 local Nova = require(game.ReplicatedStorage.NovaUI)
+```
+
+**Option B — Executor (loadstring)**
+
+```lua
+local Nova = loadstring(game:HttpGet("https://raw.githubusercontent.com/TheEGodOfficial/Nova-UI-Library/refs/heads/main/NovaUILib.lua"))()
 ```
 
 No setup calls, no config files. The module is fully self-contained.

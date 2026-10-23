@@ -460,8 +460,8 @@ function Container:AddButton(o)
 		Text = o.Text or "Button",
 		Font = Theme.FontBold,
 		TextColor3 = Color3.new(1, 1, 1),
-		ZIndex = 3,
-		Parent = face,
+		ZIndex = 4,
+		Parent = card,
 	})
 	local hit = create("TextButton", { Size = UDim2.fromScale(1, 1), ZIndex = 5, Parent = card })
 

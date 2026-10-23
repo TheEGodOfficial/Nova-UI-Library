@@ -12,7 +12,7 @@ local Nova = require(game:GetService("ReplicatedStorage"):WaitForChild("NovaUI")
 For Exploits = Put this at the top of your code, and use the variable exactly like the Roblox Studio version.
 
 ```lua
-local Nova = loadstring(game:HttpGet("https://e"))()
+local Nova = loadstring(game:HttpGet("https://raw.githubusercontent.com/TheEGodOfficial/Nova-UI-Library/refs/heads/main/NovaUILib.lua"))()
 ```
 
 All GUIs are created lazily and parented to `PlayerGui`; requiring the module draws nothing until you build something.

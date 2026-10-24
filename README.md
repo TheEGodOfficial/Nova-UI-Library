@@ -36,7 +36,7 @@
 
 **Option A — ModuleScript (studio / game scripts)**
 
-Place the contents of `NovaUI.lua` inside a `ModuleScript` (e.g. in `ReplicatedStorage`) then require it:
+Place the contents of `NovaUILib.lua` inside a `ModuleScript` (e.g. in `ReplicatedStorage`) then require it:
 
 ```lua
 local Nova = require(game.ReplicatedStorage.NovaUI)

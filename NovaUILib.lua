@@ -1434,10 +1434,7 @@ function Container:AddKeybind(o)
 	local btnScale = create("UIScale", { Parent = btn })
 	local bdrStroke = btn:FindFirstChildWhichIsA("UIStroke")  -- the stroke we just made
 
-	local hitCard = create("TextButton", { 
-    	Size = UDim2.new(1, -150, 1, 0),  -- leave room for btn on the right
-    	ZIndex = 5, Parent = card 
-	})
+	local hitCard = create("TextButton", { Size = UDim2.new(1, -150, 1, 0), ZIndex = 5, Parent = card })
 
 	local function stopListen()
 		listening = false
@@ -1768,7 +1765,7 @@ end
 --------------------------------------------------------------------------------
 -- Returns nothing; populates `parent` frame with N equal-width gradient buttons.
 -- btns = { { text, accentColor, callback }, ... }
-local function actionRow(parent, btns)
+local function actionRow(parent, btns, cards)
 	create("UIListLayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
 		Padding       = UDim.new(0, 6),
@@ -1798,6 +1795,7 @@ local function actionRow(parent, btns)
 			Parent     = face,
 		})
 		local sc  = create("UIScale", { Parent = face })
+		if cards then table.insert(cards, sc) end
 		local hit = create("TextButton", { Size = UDim2.fromScale(1,1), ZIndex = 5, Parent = face })
 		hit.MouseEnter:Connect(function()       A(sc, "Scale", 1.04, P.Bouncy) end)
 		hit.MouseLeave:Connect(function()       A(sc, "Scale", 1,    P.Snappy) end)
@@ -2144,7 +2142,7 @@ function Container:MountConfig()
 	actionRow(scopeRow, {
 		{ "🎮 Game",   Theme.Accent,    function() switchScope(true)  end },
 		{ "🌐 Global", Theme.AccentAlt, function() switchScope(false) end },
-	})
+	}, tab.Cards)
 
 	-- ── Profile selector + name input ────────────────────────────────────────
 	tab:AddSection("Profile")
@@ -2168,14 +2166,14 @@ function Container:MountConfig()
 	actionRow(row1, {
 		{ "💾 Overwrite", Theme.Accent,   function() overwrite()     end },
 		{ "✨ Save New",  Theme.Success,  function() saveNew()       end },
-	})
+	}, tab.Cards)
 
 	local row2 = tab:_card(40, true)
 	actionRow(row2, {
 		{ "📂 Load",     Theme.AccentAlt, function() load()          end },
 		{ "🗑 Delete",   Theme.Danger,    function() delete()        end },
 		{ "↺ Defaults", Theme.Warning,   function() resetDefaults() end },
-	})
+	}, tab.Cards)
 
 	tab:AddSection("Auto-Load")
 	tab:AddLabel("The last loaded/saved profile for each scope is restored automatically.")
@@ -2510,7 +2508,7 @@ function Container:MountTheme()
 	actionRow(scopeRow, {
 		{ "🎮 Game",   Theme.Accent,    function() refreshThemeUI(_themeGame)   end },
 		{ "🌐 Global", Theme.AccentAlt, function() refreshThemeUI(_themeGlobal) end },
-	})
+	}, tab.Cards)
 
 	-- ── Presets ──────────────────────────────────────────────────────────────
 	tab:AddSection("Presets")
@@ -2528,7 +2526,7 @@ function Container:MountTheme()
 			end })
 		end
 		local row = tab:_card(40, true)
-		actionRow(row, rowBtns)
+		actionRow(row, rowBtns, tab.Cards)
 	end
 
 	-- ── Color pickers (shared across both scopes) ─────────────────────────────
@@ -2616,7 +2614,7 @@ function Container:MountTheme()
 				end
 			end
 		end },
-	})
+	}, tab.Cards)
 
 	local rowLoad = tab:_card(40, true)
 	actionRow(rowLoad, {
@@ -2649,7 +2647,7 @@ function Container:MountTheme()
 				},
 			}
 		end },
-	})
+	}, tab.Cards)
 
 	tab:AddSection("Auto-Load")
 	tab:AddLabel("The last loaded/saved theme for each scope is restored automatically.")

@@ -1434,7 +1434,10 @@ function Container:AddKeybind(o)
 	local btnScale = create("UIScale", { Parent = btn })
 	local bdrStroke = btn:FindFirstChildWhichIsA("UIStroke")  -- the stroke we just made
 
-	local hitCard = create("TextButton", { Size = UDim2.fromScale(1, 1), ZIndex = 5, Parent = card })
+	local hitCard = create("TextButton", { 
+    	Size = UDim2.new(1, -150, 1, 0),  -- leave room for btn on the right
+    	ZIndex = 5, Parent = card 
+	})
 
 	local function stopListen()
 		listening = false

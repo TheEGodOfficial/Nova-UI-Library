@@ -1485,16 +1485,6 @@ function Container:AddKeybind(o)
 			stopListen()
 			return
 		end
-		-- ignore modifier-only presses
-		local mods = {
-			Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift,
-			Enum.KeyCode.LeftControl, Enum.KeyCode.RightControl,
-			Enum.KeyCode.LeftAlt, Enum.KeyCode.RightAlt,
-			Enum.KeyCode.LeftSuper, Enum.KeyCode.RightSuper,
-		}
-		for _, m in mods do
-			if input.KeyCode == m then return end
-		end
 		bound = input.KeyCode
 		stopListen()
 		if o.Callback then task.spawn(o.Callback, bound) end

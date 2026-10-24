@@ -2684,10 +2684,19 @@ function Window:Toggle()
 end
 
 function Window:Minimize(state)
-	if state == nil then state = not self.Minimized end
-	self.Minimized = state
-	local h = state and 46 or self.Size.Y
-	A(self.Root, "Size", UDim2.fromOffset(self.Size.X, h), P.Smooth)
+    if state == nil then state = not self.Minimized end
+    self.Minimized = state
+    local h = state and 46 or self.Size.Y
+    A(self.Root, "Size", UDim2.fromOffset(self.Size.X, h), P.Smooth)
+    if self.Sidebar then
+        if state then
+            -- hide immediately as the window collapses
+            self.Sidebar.Visible = false
+        else
+            -- show before the expand animation plays
+            self.Sidebar.Visible = true
+        end
+    end
 end
 
 -- Change the small text line shown under the player name in the sidebar.

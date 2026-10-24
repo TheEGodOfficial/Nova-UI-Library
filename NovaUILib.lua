@@ -559,10 +559,10 @@ function Container:AddButton(o)
 		Rotation = 20,
 	})
 	-- face is a CanvasGroup so ripple clips to rounded corners
-	local face = create("CanvasGroup", {
-		Size             = UDim2.fromScale(1, 1),
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		Parent           = card,
+	local face = create("Frame", {
+    	Size             = UDim2.fromScale(1, 1),
+    	BackgroundColor3 = Color3.new(1, 1, 1),
+    	Parent           = card,
 	}, { corner(8), grad })
 
 	local label = create("TextLabel", {
@@ -580,7 +580,7 @@ function Container:AddButton(o)
 	local hit = create("TextButton", {
     	Size   = UDim2.fromScale(1, 1),
     	ZIndex = 5,
-    	Parent = face,
+    	Parent = face,  -- ← inside face, not card
 	})
 
 	hit.MouseEnter:Connect(function()

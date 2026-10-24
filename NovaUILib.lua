@@ -2424,6 +2424,15 @@ function ThemeConfig:AutoLoad()
 	return nil
 end
 
+function Nova.AutoLoadTheme()
+    task.defer(function()
+        local loaded = _themeGame:AutoLoad()
+        if loaded then
+            Nova.Notify{ Title="Theme", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
+        end
+    end)
+end
+
 -- ── tab UI ────────────────────────────────────────────────────────────────────
 
 function Container:MountTheme()
@@ -2633,15 +2642,6 @@ function Container:MountTheme()
 
 	tab:AddSection("Auto-Load")
 	tab:AddLabel("The last loaded/saved theme for each scope is restored automatically.")
-
-	-- Initial auto-load (game scope)
-	task.defer(function()
-		local loaded = _themeGame:AutoLoad()
-		if loaded then
-			selectorComp:Set(loaded)
-			Nova.Notify{ Title="Theme", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
-		end
-	end)
 end
 
 

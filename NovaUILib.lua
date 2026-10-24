@@ -578,9 +578,9 @@ function Container:AddButton(o)
 	-- hit sits on card (same level as face) so it captures the full card area
 	-- ZIndex 5 puts it above face's children visually but input still routes through
 	local hit = create("TextButton", {
-		Size   = UDim2.fromScale(1, 1),
-		ZIndex = 5,
-		Parent = card,
+    	Size   = UDim2.fromScale(1, 1),
+    	ZIndex = 5,
+    	Parent = face,
 	})
 
 	hit.MouseEnter:Connect(function()

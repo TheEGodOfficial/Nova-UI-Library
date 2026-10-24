@@ -68,8 +68,8 @@ ScreenGuis are parented automatically: `gethui()` → `CoreGui` → `PlayerGui`.
 ```lua
 local Nova = require(game.ReplicatedStorage.NovaUI)
 
-local win     = Nova.Window{ Title = "My Game", Subtitle = "v1", ToggleKey = Enum.KeyCode.RightShift }
-local main    = win:AddTab("Main", "🏠")
+local win  = Nova.Window{ Title = "My Game", Subtitle = "v1", ToggleKey = Enum.KeyCode.RightShift }
+local main = win:AddTab("Main", "🏠")
 
 main:AddSection("Player")
 
@@ -148,6 +148,10 @@ win:Minimize()       -- toggles
 win:Minimize(true)   -- force minimized
 ```
 
+> **Bug fix — Minimize:** `Sidebar.Visible` is not toggled by the default `Minimize` implementation.
+> Add `self.Sidebar.Visible = not state` inside `Window:Minimize` to hide the profile card and tab list
+> when the window is collapsed.
+
 ---
 
 ## Components
@@ -167,8 +171,8 @@ Gradient-filled button with a ripple effect.
 
 ```lua
 tab:AddButton{
-    Text     = "Teleport",          -- string, default "Button"
-    Callback = function() end,      -- called on click
+    Text     = "Teleport",     -- string, default "Button"
+    Callback = function() end, -- called on click
 }
 ```
 
@@ -179,6 +183,12 @@ local btn = tab:AddButton{ Text = "Go", Callback = function() print("clicked") e
 btn:SetText("Done!")
 ```
 
+> **Bug fix — button text invisible:** The `face` frame was a `CanvasGroup`, which composites all
+> children into a flat image before rendering. A sibling `hit` TextButton drawn on top of that image
+> obscured the label regardless of `ZIndex`. Fix: change `face` from `CanvasGroup` to `Frame`.
+> This applies to `AddButton` (line ~562) **and** the shared `actionRow` helper used by the Config
+> and Theme tabs (line ~1788).
+
 ---
 
 ### `AddToggle`
@@ -187,10 +197,10 @@ Animated on/off switch.
 
 ```lua
 tab:AddToggle{
-    Text     = "Infinite Jump",    -- string
-    Key      = "infiniteJump",     -- string, registers with the config system
-    Default  = false,              -- bool
-    Callback = function(v) end,    -- receives bool
+    Text     = "Infinite Jump",
+    Key      = "infiniteJump",  -- registers with the config system
+    Default  = false,
+    Callback = function(v) end, -- receives bool
 }
 ```
 
@@ -198,7 +208,7 @@ tab:AddToggle{
 
 ```lua
 local t = tab:AddToggle{ Text = "Fly", Default = false, Callback = function(v) print(v) end }
-t:Set(true)   -- fires Callback(true)
+t:Set(true)
 print(t:Get()) --> true
 ```
 
@@ -210,14 +220,14 @@ Draggable range slider.
 
 ```lua
 tab:AddSlider{
-    Text      = "Walk Speed",      -- string
-    Key       = "walkSpeed",       -- string
-    Min       = 16,                -- number, default 0
-    Max       = 200,               -- number, default 100
-    Default   = 16,                -- number
-    Increment = 1,                 -- snap step, default 1
-    Suffix    = " st",             -- appended to the display value, default ""
-    Callback  = function(v) end,   -- receives number
+    Text      = "Walk Speed",
+    Key       = "walkSpeed",
+    Min       = 16,             -- default 0
+    Max       = 200,            -- default 100
+    Default   = 16,
+    Increment = 1,              -- snap step, default 1
+    Suffix    = " st",          -- appended to display value, default ""
+    Callback  = function(v) end,
 }
 ```
 
@@ -237,11 +247,11 @@ Single-line text box. `Callback` fires on `FocusLost` (Enter key or click-away).
 
 ```lua
 tab:AddTextInput{
-    Text        = "Player Name",   -- label to the left
+    Text        = "Player Name",
     Key         = "playerName",
-    Default     = "",              -- initial text
+    Default     = "",
     Placeholder = "Type here…",
-    Callback    = function(text, enter) end,  -- enter=true when confirmed
+    Callback    = function(text, enter) end, -- enter=true when confirmed
 }
 ```
 
@@ -252,7 +262,7 @@ tab:AddTextInput{
 ```lua
 local inp = tab:AddTextInput{ Text = "Server", Placeholder = "IP…",
     Callback = function(text, enter) if enter then print("Connecting to", text) end end }
-inp:Set("127.0.0.1")  -- fires Callback("127.0.0.1", true)
+inp:Set("127.0.0.1")
 ```
 
 ---
@@ -277,9 +287,9 @@ tab:AddDropdown{
 local dd = tab:AddDropdown{ Text = "Mode", Options = {"A","B"}, Default = "A",
     Callback = function(v) print(v) end }
 
-dd:AddOption("C")          -- adds without closing
-dd:RemoveOption("B")       -- removes; deselects if it was selected
-dd:SetOptions({"X","Y"})   -- full replace
+dd:AddOption("C")
+dd:RemoveOption("B")
+dd:SetOptions({"X","Y"})
 dd:Set("X")
 print(dd:Get())  --> "X"
 ```
@@ -297,7 +307,7 @@ tab:AddMultiDropdown{
     Options  = { "Speed", "Jump", "Damage", "Defense" },
     Default  = { "Speed" },
     Max      = 2,               -- max simultaneous selections; nil = unlimited
-    Callback = function(selected) end,  -- receives { "Speed", "Jump" }
+    Callback = function(selected) end,
 }
 ```
 
@@ -307,7 +317,6 @@ tab:AddMultiDropdown{
 local m = tab:AddMultiDropdown{ Text = "Flags", Options = {"A","B","C"}, Default = {"A","B"},
     Callback = function(t) print(table.concat(t, ", ")) end }
 m:Set({"C"})
-print(m:Get())  --> { "C" }
 ```
 
 ---
@@ -321,7 +330,7 @@ tab:AddColorPicker{
     Text     = "Beam Color",
     Key      = "beamColor",
     Default  = Color3.fromRGB(255, 80, 120),
-    Callback = function(c) end,   -- fires continuously while dragging
+    Callback = function(c) end, -- fires continuously while dragging
 }
 ```
 
@@ -344,7 +353,7 @@ tab:AddKeybind{
     Text     = "Noclip Toggle",
     Key      = "noclipKey",
     Default  = Enum.KeyCode.N,
-    Callback = function(key) end,  -- receives Enum.KeyCode
+    Callback = function(key) end, -- receives Enum.KeyCode
 }
 ```
 
@@ -375,7 +384,7 @@ lbl:Set("Applied immediately.")
 
 ### `AddSection`
 
-Slim uppercase divider header. Returns nothing.
+Slim uppercase divider header.
 
 ```lua
 tab:AddSection("Visuals")
@@ -407,35 +416,75 @@ bar:Set(1.0)
 
 ## Config System
 
-The config system saves and loads values for every component tagged with `Key`. The GUI tab provides Game/Global scope selection, profile CRUD, and auto-load — no scripting required beyond calling `MountConfig()`.
+The config system saves and loads values for every component tagged with `Key`. The GUI tab provides
+Game/Global scope selection, profile CRUD, and auto-load — no scripting required beyond calling
+`MountConfig()`.
 
 ### Setup
 
-Tag components on **any** tab with `Key = "..."` **before** calling `MountConfig()`:
+Tag components on **any** tab with `Key = "..."`, then call `MountConfig()`, then call
+`Nova.AutoLoadConfig()` **last** — after all keyed components have been added.
 
 ```lua
 local main = win:AddTab("Main", "🏠")
 
-main:AddToggle{ Text = "God Mode",  Key = "godMode",  Default = false, Callback = function(v) end }
-main:AddSlider{ Text = "Speed",     Key = "speed",    Default = 16,    Callback = function(v) end }
-main:AddKeybind{ Text = "Fly Key",  Key = "flyKey",   Default = Enum.KeyCode.F, Callback = function(k) end }
+main:AddToggle{ Text = "God Mode", Key = "godMode",  Default = false, Callback = function(v) end }
+main:AddSlider{ Text = "Speed",    Key = "speed",    Default = 16,    Callback = function(v) end }
+main:AddKeybind{ Text = "Fly Key", Key = "flyKey",   Default = Enum.KeyCode.F, Callback = function(k) end }
 
--- Mount the config UI last
 local cfgTab = win:AddTab("Config", "⚙️")
 cfgTab:MountConfig()
+
+Nova.AutoLoadConfig()  -- call this last, after all keyed components are defined
+```
+
+### Known bugs and fixes
+
+#### Bug 1 — Components on other tabs never registered
+
+`MountConfig()` originally patched `Add*` methods only on the config tab itself, so components added
+to any other tab were never registered and nothing was saved or loaded.
+
+**Fix:** patch `Container` (the shared metatable) instead of the local tab:
+
+```lua
+-- Inside MountConfig(), change:
+tab[method] = function(self2, o2, ...)   -- WRONG — only patches the config tab
+
+-- To:
+Container[method] = function(self2, o2, ...)  -- CORRECT — patches all tabs
+```
+
+#### Bug 2 — AutoLoad runs before components are registered
+
+The original `task.defer(AutoLoad)` inside `MountConfig()` fires before the caller has finished
+adding keyed components, so `_entries` is empty and nothing gets applied.
+
+**Fix:** remove the deferred auto-load from `MountConfig()` and expose `Nova.AutoLoadConfig()` to
+call manually at the end of your setup script:
+
+```lua
+function Nova.AutoLoadConfig()
+    task.defer(function()
+        local loaded = Nova._cfg:AutoLoad()
+        if loaded then
+            Nova.Notify{ Title="Config", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
+        end
+    end)
+end
 ```
 
 ### What `MountConfig()` adds to the tab
 
-- **Game / Global toggle** — Game profiles are namespaced by `PlaceId`; Global profiles are shared across all games that use NovaUI.
+- **Game / Global toggle** — Game profiles are namespaced by `PlaceId`; Global profiles are shared.
 - **Profile dropdown** — select a saved profile.
 - **Profile name input** — type a name for a new profile.
-- **Save New** — saves current values under the typed name; prompts to overwrite if the name exists.
+- **Save New** — saves current values under the typed name; prompts to overwrite if it exists.
 - **Overwrite** — overwrites the selected profile with current values.
 - **Load** — applies the selected profile's saved values to all registered components.
 - **Delete** — removes the selected profile (with confirmation dialog).
 - **Reset Defaults** — restores all registered components to their `Default` values.
-- **Auto-load** — on startup, the last used profile for the active scope is loaded automatically.
+- **Auto-load** — on startup, the last used profile for the active scope is loaded (via `Nova.AutoLoadConfig()`).
 
 ### Scope
 
@@ -446,24 +495,24 @@ cfgTab:MountConfig()
 
 ### Manual registration
 
-For components created outside a tab (or without a `Key`):
-
 ```lua
 local comp = someTab:AddToggle{ Text = "X", Default = false, Callback = function(v) end }
 Nova._cfg:Register("myKey", comp, false)  -- (key, component, defaultValue)
 ```
 
-`Nova._cfg` always points to whichever scope (Game or Global) is currently active in the GUI.
+`Nova._cfg` always points to whichever scope is currently active in the GUI.
 
 ### Supported component types
 
-`AddToggle`, `AddSlider`, `AddTextInput`, `AddDropdown`, `AddMultiDropdown`, `AddColorPicker`, `AddKeybind` all support `Key` auto-registration.
+`AddToggle`, `AddSlider`, `AddTextInput`, `AddDropdown`, `AddMultiDropdown`, `AddColorPicker`,
+`AddKeybind` all support `Key` auto-registration.
 
 ---
 
 ## Theme System
 
-The theme system lets users change all UI colors live, save named theme profiles, and bind the window toggle key — entirely through a GUI tab.
+The theme system lets users change all UI colors live, save named theme profiles, and bind the window
+toggle key — entirely through a GUI tab.
 
 ### Setup
 
@@ -474,10 +523,10 @@ themeTab:MountTheme()
 
 ### What `MountTheme()` adds to the tab
 
-- **Toggle Keybind picker** — binds the key used to open/close the window (same as `ToggleKey` on `Nova.Window`).
+- **Toggle Keybind picker** — binds the key used to open/close the window.
 - **Game / Global scope toggle** — same semantics as the Config system.
 - **Preset buttons** — one-click palettes: `Nova Dark`, `Midnight`, `Crimson`, `Ocean`, `Forest`, `Mono`.
-- **Color pickers** — one live `AddColorPicker` per theme key (see table below); changes apply to `Nova.Theme` instantly.
+- **Color pickers** — one live `AddColorPicker` per theme key; changes apply to `Nova.Theme` instantly.
 - **Saved Themes** — profile selector, name input, Save New, Overwrite, Load, Delete.
 - **Auto-load** — restores the last used theme on startup.
 
@@ -500,14 +549,13 @@ themeTab:MountTheme()
 ### Setting the theme from code
 
 ```lua
--- Override specific keys at any time:
 Nova.SetTheme({
     Accent    = Color3.fromRGB(255, 60, 100),
     AccentAlt = Color3.fromRGB(255, 140, 40),
 })
 ```
 
-### Built-in presets (reference)
+### Built-in presets
 
 | Preset | Accent | AccentAlt |
 |---|---|---|
@@ -524,20 +572,19 @@ Nova.SetTheme({
 
 ### `Nova.Notify(options)` → `{ Dismiss() }`
 
-Slide-in toast notifications that stack at the bottom-right of the screen. Auto-dismiss after `Duration` seconds; click to dismiss early.
+Slide-in toast notifications that stack at the bottom-right of the screen.
 
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `Title` | `string` | `"Notification"` | Bold title line. |
 | `Text` | `string` | `""` | Body text (wraps, truncates at 2 lines). |
-| `Type` | `string` | `"info"` | `"info"`, `"success"`, `"warning"`, `"error"` — sets the accent color. |
+| `Type` | `string` | `"info"` | `"info"`, `"success"`, `"warning"`, `"error"` |
 | `Duration` | `number` | `4` | Seconds before auto-dismiss. |
 
 ```lua
 Nova.Notify{ Title = "Saved", Text = "Profile saved successfully.", Type = "success", Duration = 3 }
 Nova.Notify{ Title = "Error", Text = "Could not connect.", Type = "error" }
 
--- Manual dismiss:
 local n = Nova.Notify{ Title = "Loading…", Text = "Please wait.", Duration = 60 }
 task.delay(2, function() n.Dismiss() end)
 ```
@@ -548,38 +595,33 @@ task.delay(2, function() n.Dismiss() end)
 
 ### `Nova.Dialog(options)` → `{ Close() }`
 
-Animated modal dialog with a dim overlay. Clicking outside dismisses it unless `Dismissible = false`.
+Animated modal dialog with a dim overlay.
 
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `Title` | `string` | `"Dialog"` | Bold heading. |
 | `Text` | `string` | `""` | Body message (word-wrapped). |
-| `Buttons` | `{{Text, Primary?, Callback?}}` | `{{ Text="OK", Primary=true }}` | Button list rendered right-aligned. `Primary = true` styles with the accent gradient. |
-| `Dismissible` | `bool` | `true` | If `false`, clicking the dim overlay does nothing. |
+| `Buttons` | `{{Text, Primary?, Callback?}}` | `{{ Text="OK", Primary=true }}` | Right-aligned button list. |
+| `Dismissible` | `bool` | `true` | If `false`, clicking the overlay does nothing. |
 
 ```lua
 Nova.Dialog{
     Title   = "Delete profile?",
     Text    = "This cannot be undone.",
     Buttons = {
-        {
-            Text     = "Delete",
-            Primary  = true,
-            Callback = function() print("Deleted") end,
-        },
+        { Text = "Delete", Primary = true, Callback = function() print("Deleted") end },
         { Text = "Cancel" },
     },
 }
 ```
 
 ```lua
--- Non-dismissible (forces a choice):
 Nova.Dialog{
     Title       = "Accept Terms",
     Text        = "You must accept before continuing.",
     Dismissible = false,
     Buttons     = {
-        { Text = "Accept", Primary = true, Callback = function() startGame() end },
+        { Text = "Accept",  Primary = true, Callback = function() startGame() end },
         { Text = "Decline", Callback = function() game:Shutdown() end },
     },
 }
@@ -589,11 +631,7 @@ Nova.Dialog{
 
 ## Spring Animation Engine
 
-NovaUI includes a spring physics engine that drives all its own animations. You can use it to animate any Roblox `GuiObject` property.
-
 ### `Nova.Animate(instance, property, target, speed, damping)`
-
-Starts or updates a spring animation toward `target`.
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -601,15 +639,12 @@ Starts or updates a spring animation toward `target`.
 | `property` | `string` | Property name: `"Size"`, `"Position"`, `"BackgroundColor3"`, etc. |
 | `target` | `number / Color3 / UDim2 / Vector2 / UDim` | Target value. |
 | `speed` | `number` or `{speed, damping}` | Spring frequency. Higher = snappier. |
-| `damping` | `number` | `1.0` = critically damped (no bounce), `< 1` = underdamped (bouncy). |
+| `damping` | `number` | `1.0` = no bounce, `< 1` = bouncy. |
 
 Supported types: `number`, `Color3`, `UDim2`, `Vector2`, `UDim`.
 
 ```lua
--- Animate a frame to a new size:
 Nova.Animate(myFrame, "Size", UDim2.fromOffset(200, 100), 24, 0.8)
-
--- Using a preset table:
 Nova.Animate(myFrame, "BackgroundColor3", Color3.fromRGB(255, 0, 0), Nova.Presets.Bouncy)
 ```
 
@@ -639,7 +674,7 @@ Nova.Animate(icon,  "Size", UDim2.fromOffset(40, 40), Nova.Presets.Bouncy)
 
 ## Storage Layer
 
-`Nova.Storage` is the low-level persistence API used internally by the Config and Theme systems. You can use it directly for custom save/load logic.
+`Nova.Storage` is the low-level persistence API used internally by the Config and Theme systems.
 
 ### `Nova.Storage.Save(namespace, key, data)`
 
@@ -657,7 +692,9 @@ print(score)  --> "9999"
 
 ### `Nova.JSON`
 
-A minimal JSON encoder/decoder bundled with NovaUI. Supports `number`, `boolean`, `string`, `nil`, arrays, and dictionaries. Also handles `Color3` (as `{ __type="Color3", hex="RRGGBB" }`) and `Enum.KeyCode` (as `{ __type="KeyCode", name="..." }`) when used through the config serialisation helpers.
+Minimal JSON encoder/decoder. Supports `number`, `boolean`, `string`, `nil`, arrays, and
+dictionaries. Also handles `Color3` (as `{ __type="Color3", hex="RRGGBB" }`) and `Enum.KeyCode`
+(as `{ __type="KeyCode", name="..." }`).
 
 ```lua
 local encoded = Nova.JSON.encode({ speed = 100, fly = true })
@@ -673,55 +710,40 @@ print(decoded.speed)  --> 100
 
 ### Multiple windows
 
-Each call to `Nova.Window()` creates an independent window. They share the same `Nova.Theme` table and spring engine.
-
 ```lua
 local mainWin  = Nova.Window{ Title = "Main",  ToggleKey = Enum.KeyCode.RightShift }
 local adminWin = Nova.Window{ Title = "Admin", ToggleKey = Enum.KeyCode.F9, StartHidden = true }
 ```
 
-### Programmatic Get / Set on all components
-
-Every input component supports `:Get()` and `:Set(value)`. `Set` always fires `Callback`.
+### Programmatic Get / Set
 
 ```lua
 local toggle = tab:AddToggle{ Text = "Mute", Default = false, Callback = function(v) print(v) end }
 local slider = tab:AddSlider{ Text = "Vol",  Default = 50,    Callback = function(v) print(v) end }
 
--- Read current values:
 print(toggle:Get())  --> false
-print(slider:Get())  --> 50
-
--- Set programmatically (fires Callback):
 toggle:Set(true)
 slider:Set(80)
 ```
 
 ### Live Dropdown mutation
 
-`AddOption`, `RemoveOption`, and `SetOptions` all work while the dropdown is open.
-
 ```lua
 local dd = tab:AddDropdown{ Text = "Players", Options = {}, Callback = function(v) end }
 
--- Populate from a remote event:
 game.ReplicatedStorage.PlayerList.OnClientEvent:Connect(function(list)
     dd:SetOptions(list)
 end)
 ```
 
-### Registering components manually
-
-Use `Nova._cfg:Register` for components that weren't created with a `Key`, or that were created before `MountConfig` was called on a different tab.
+### Manual component registration
 
 ```lua
 local comp = someTab:AddToggle{ Text = "X", Default = true, Callback = function(v) end }
-Nova._cfg:Register("myExtraKey", comp, true)  -- key, component, default
+Nova._cfg:Register("myExtraKey", comp, true)
 ```
 
 ### Player profile card
-
-The sidebar always shows the local player's avatar, display name, and a status line. Update the status line at any time:
 
 ```lua
 win:SetStatusText("Round 3 — 2 players left")
@@ -730,16 +752,11 @@ win:SetStatusText(nil)  -- reset to "NovaUI 1.4.0"
 
 ### Animating your own GUI
 
-You can use the spring engine on any GuiObject outside of NovaUI windows:
-
 ```lua
 local frame = script.Parent.MyFrame
 
 Nova.Animate(frame, "Size",             UDim2.fromOffset(300, 200), Nova.Presets.Bouncy)
 Nova.Animate(frame, "BackgroundColor3", Color3.fromRGB(30, 30, 50), Nova.Presets.Smooth)
-Nova.Animate(frame, "GroupTransparency", 0,                         24, 0.9)
-
--- Cancel and snap immediately:
 Nova.Snap(frame, "Size", UDim2.fromOffset(0, 0))
 ```
 
@@ -747,18 +764,16 @@ Nova.Snap(frame, "Size", UDim2.fromOffset(0, 0))
 
 ## Full Example
 
-A complete LocalScript demonstrating every major feature.
-
 ```lua
 --!nonstrict
 local Nova = require(game.ReplicatedStorage.NovaUI)
 
 -- ── Window ────────────────────────────────────────────────────────────────────
 local win = Nova.Window{
-    Title      = "Nova Demo",
-    Subtitle   = "v1.4",
-    ToggleKey  = Enum.KeyCode.RightShift,
-    Size       = Vector2.new(600, 420),
+    Title     = "Nova Demo",
+    Subtitle  = "v1.4",
+    ToggleKey = Enum.KeyCode.RightShift,
+    Size      = Vector2.new(600, 420),
 }
 
 -- ── Main tab ──────────────────────────────────────────────────────────────────
@@ -789,7 +804,7 @@ main:AddSlider{
 
 main:AddSlider{
     Text = "Jump Power", Key = "jump", Min = 50, Max = 500, Default = 50,
-    Suffix = "", Increment = 10,
+    Increment = 10,
     Callback = function(v)
         local char = game.Players.LocalPlayer.Character
         local hum  = char and char:FindFirstChild("Humanoid")
@@ -807,9 +822,7 @@ main:AddColorPicker{
 
 main:AddToggle{
     Text = "Fullbright", Key = "fullbright", Default = false,
-    Callback = function(v)
-        game.Lighting.Brightness = v and 2 or 1
-    end,
+    Callback = function(v) game.Lighting.Brightness = v and 2 or 1 end,
 }
 
 main:AddSection("Actions")
@@ -882,7 +895,10 @@ cfgTab:MountConfig()
 local themeTab = win:AddTab("Theme", "🎨")
 themeTab:MountTheme()
 
--- ── Update the status line after some game event ──────────────────────────────
+-- ── Call AutoLoadConfig LAST, after all keyed components are defined ──────────
+Nova.AutoLoadConfig()
+
+-- ── Status line update ────────────────────────────────────────────────────────
 task.delay(3, function()
     win:SetStatusText("Round started!")
 end)

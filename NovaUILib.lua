@@ -1642,7 +1642,11 @@ local function jsonEncode(val)
 		return '"' .. val .. '"'
 	elseif t == "table" then
 		-- check if array
-		local isArr = (#val > 0)
+		local isArr = (function()
+    		local count = 0
+    		for _ in val do count += 1 end
+    		return count > 0 and #val == count
+		end)()
 		if isArr then
 			local parts = {}
 			for _, v in val do table.insert(parts, jsonEncode(v)) end
@@ -1943,12 +1947,19 @@ function Config:LoadProfile(name)
 end
 
 function Config:DeleteProfile(name)
-	Storage.Save(self._namespace, name, "")
-	self:_removeFromIndex(name)
-	if self._activeProfile == name then
-		self._activeProfile = nil
-		Storage.Save(self._namespace, "_active", JSON.encode(nil))
-	end
+    pcall(function()
+        if HAS_FS then
+            local path = Storage.Folder .. self._namespace .. "_" .. name .. ".json"
+            if isfile(path) then delfile(path) end  -- delfile if your executor supports it
+        else
+            Storage.Save(self._namespace, name, "")  -- RS fallback unchanged
+        end
+    end)
+    self:_removeFromIndex(name)
+    if self._activeProfile == name then
+        self._activeProfile = nil
+        Storage.Save(self._namespace, "_active", JSON.encode(nil))
+    end
 end
 
 function Config:ResetDefaults()
@@ -2401,12 +2412,19 @@ function ThemeConfig:LoadProfile(name)
 end
 
 function ThemeConfig:DeleteProfile(name)
-	Storage.Save(self._namespace, name, "")
-	self:_removeFromIndex(name)
-	if self._activeProfile == name then
-		self._activeProfile = nil
-		Storage.Save(self._namespace, "_active", JSON.encode(nil))
-	end
+    pcall(function()
+        if HAS_FS then
+            local path = Storage.Folder .. self._namespace .. "_" .. name .. ".json"
+            if isfile(path) then delfile(path) end
+        else
+            Storage.Save(self._namespace, name, "")
+        end
+    end)
+    self:_removeFromIndex(name)
+    if self._activeProfile == name then
+        self._activeProfile = nil
+        Storage.Save(self._namespace, "_active", JSON.encode(nil))
+    end
 end
 
 function ThemeConfig:ApplyPreset(presetName)

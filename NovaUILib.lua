@@ -1971,6 +1971,15 @@ function Config:AutoLoad()
 	return nil
 end
 
+function Nova.AutoLoadConfig()
+    task.defer(function()
+        local loaded = Nova._cfg:AutoLoad()
+        if loaded then
+            Nova.Notify{ Title="Config", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
+        end
+    end)
+end
+
 -- ── tab UI ────────────────────────────────────────────────────────────────────
 
 -- Builds the profile-management UI section for whichever cfg is active.
@@ -2088,16 +2097,16 @@ function Container:MountConfig()
 
 	-- Patch Add* to auto-register Key'd components into whichever cfg is active
 	for _, method in AUTO_REGISTER_METHODS do
-		local original = Container[method]
-		if original then
-			tab[method] = function(self2, o2, ...)
-				local comp = original(self2, o2, ...)
-				if o2 and o2.Key and comp then
-					Nova._cfg:Register(o2.Key, comp, o2.Default)
-				end
-				return comp
-			end
-		end
+	    local original = Container[method]
+	    if original then
+	        Container[method] = function(self2, o2, ...)
+	            local comp = original(self2, o2, ...)
+	            if o2 and o2.Key and comp then
+	                Nova._cfg:Register(o2.Key, comp, o2.Default)
+	            end
+	            return comp
+	        end
+	    end
 	end
 
 	-- ── Game / Global toggle ─────────────────────────────────────────────────
@@ -2170,14 +2179,6 @@ function Container:MountConfig()
 	-- Initialise callbacks and auto-load game scope
 	overwrite, saveNew, load, delete, resetDefaults =
 		buildConfigUI(tab, Nova._cfg, selectorComp, nameInput)
-
-	task.defer(function()
-		local loaded = Nova._cfg:AutoLoad()
-		if loaded then
-			selectorComp:Set(loaded)
-			Nova.Notify{ Title="Config", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
-		end
-	end)
 end
 
 

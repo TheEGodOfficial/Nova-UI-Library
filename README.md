@@ -530,28 +530,6 @@ themeTab:MountTheme()
 - **Saved Themes** — profile selector, name input, Save New, Overwrite, Load, Delete.
 - **Auto-load** — restores the last used theme on startup (via `Nova.AutoLoadTheme()`).
 
-### Known bug and fix
-
-#### Bug — AutoLoad runs before pickers are ready
-
-The `task.defer(AutoLoad)` inside `MountTheme()` fires before the color pickers are fully wired,
-so loaded theme values have nothing to apply to.
-
-**Fix:** remove the deferred auto-load from `MountTheme()` and expose `Nova.AutoLoadTheme()`:
-
-```lua
-function Nova.AutoLoadTheme()
-    task.defer(function()
-        local loaded = _themeGame:AutoLoad()
-        if loaded then
-            Nova.Notify{ Title="Theme", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
-        end
-    end)
-end
-```
-
-Call it at the end of your setup script alongside `Nova.AutoLoadConfig()`:
-
 ```lua
 cfgTab:MountConfig()
 themeTab:MountTheme()

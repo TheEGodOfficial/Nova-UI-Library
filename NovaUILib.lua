@@ -1785,11 +1785,11 @@ local function actionRow(parent, btns)
 			Color    = ColorSequence.new(b[2], Theme.AccentAlt),
 			Rotation = 20,
 		})
-		local face = create("CanvasGroup", {
-			Size             = UDim2.new(1/n, if n > 1 then -math.ceil(6*(n-1)/n) else 0, 1, 0),
-			BackgroundColor3 = Color3.new(1,1,1),
-			LayoutOrder      = i,
-			Parent           = parent,
+		local face = create("Frame", {
+    		Size             = UDim2.new(1/n, if n > 1 then -math.ceil(6*(n-1)/n) else 0, 1, 0),
+    		BackgroundColor3 = Color3.new(1,1,1),
+    		LayoutOrder      = i,
+    		Parent           = parent,
 		}, { corner(7), grad })
 		create("TextLabel", {
 			Size       = UDim2.fromScale(1,1),

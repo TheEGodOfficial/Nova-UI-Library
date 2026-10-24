@@ -1860,6 +1860,21 @@ Nova._cfgGlobal = _cfgGlobal
 -- Nova._cfg points to whichever is currently active (starts as game)
 Nova._cfg = _cfgGame
 
+-- Patch Add* methods at module level so any tab's Key'd components are always registered,
+-- regardless of whether MountConfig() has been called yet.
+for _, method in AUTO_REGISTER_METHODS do
+	local original = Container[method]
+	if original then
+		Container[method] = function(self2, o2, ...)
+			local comp = original(self2, o2, ...)
+			if o2 and o2.Key and comp then
+				Nova._cfg:Register(o2.Key, comp, o2.Default)
+			end
+			return comp
+		end
+	end
+end
+
 -- ── internal helpers ──────────────────────────────────────────────────────────
 
 function Config:_getIndex()
@@ -2096,20 +2111,6 @@ end
 
 function Container:MountConfig()
 	local tab = self
-
-	-- Patch Add* to auto-register Key'd components into whichever cfg is active
-	for _, method in AUTO_REGISTER_METHODS do
-	    local original = Container[method]
-	    if original then
-	        Container[method] = function(self2, o2, ...)
-	            local comp = original(self2, o2, ...)
-	            if o2 and o2.Key and comp then
-	                Nova._cfg:Register(o2.Key, comp, o2.Default)
-	            end
-	            return comp
-	        end
-	    end
-	end
 
 	-- ── Game / Global toggle ─────────────────────────────────────────────────
 	tab:AddSection("Config Scope")

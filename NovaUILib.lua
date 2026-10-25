@@ -86,19 +86,19 @@ Nova.Version = "1.4.3"
 --------------------------------------------------------------------------------
 
 Nova.Theme = {
-	Background  = Color3.fromRGB(16, 16, 22),
-	Surface     = Color3.fromRGB(26, 26, 36),
+	Background = Color3.fromRGB(16, 16, 22),
+	Surface = Color3.fromRGB(26, 26, 36),
 	SurfaceHover= Color3.fromRGB(38, 38, 54),
-	Stroke      = Color3.fromRGB(52, 52, 72),
-	Accent      = Color3.fromRGB(124, 92, 255),
-	AccentAlt   = Color3.fromRGB(64, 170, 255),
-	Text        = Color3.fromRGB(240, 240, 250),
-	SubText     = Color3.fromRGB(145, 145, 170),
-	Success     = Color3.fromRGB(70, 210, 140),
-	Warning     = Color3.fromRGB(255, 190, 70),
-	Danger      = Color3.fromRGB(255, 90, 105),
-	Font        = Enum.Font.GothamMedium,
-	FontBold    = Enum.Font.GothamBold,
+	Stroke = Color3.fromRGB(52, 52, 72),
+	Accent = Color3.fromRGB(124, 92, 255),
+	AccentAlt = Color3.fromRGB(64, 170, 255),
+	Text = Color3.fromRGB(240, 240, 250),
+	SubText = Color3.fromRGB(145, 145, 170),
+	Success = Color3.fromRGB(70, 210, 140),
+	Warning = Color3.fromRGB(255, 190, 70),
+	Danger = Color3.fromRGB(255, 90, 105),
+	Font = Enum.Font.GothamMedium,
+	FontBold = Enum.Font.GothamBold,
 }
 local Theme = Nova.Theme
 
@@ -119,7 +119,7 @@ local P = {
 Nova.Presets = P
 
 local Springs = {}
-local Tracked  = setmetatable({}, { __mode = "k" })
+local Tracked = setmetatable({}, { __mode = "k" })
 local stepConn
 
 local function encode(v)
@@ -180,7 +180,7 @@ end
 
 function Nova.Animate(inst, prop, target, speed, damping)
 	if type(speed) == "table" then speed, damping = speed[1], speed[2] end
-	local kind  = typeof(target)
+	local kind = typeof(target)
 	local props = Springs[inst]
 	if not props then
 		props = {}
@@ -191,10 +191,10 @@ function Nova.Animate(inst, prop, target, speed, damping)
 		end
 	end
 	local tgt = encode(target)
-	local s   = props[prop]
+	local s = props[prop]
 	if s and s.kind == kind then
-		s.tgt    = tgt
-		s.speed  = speed  or s.speed
+		s.tgt = tgt
+		s.speed = speed  or s.speed
 		s.damping= damping or s.damping
 	else
 		local cur = encode(inst[prop])
@@ -233,10 +233,10 @@ local function create(class, props, children)
 	end
 	if inst:IsA("GuiButton") then inst.AutoButtonColor = false end
 	if inst:IsA("TextLabel") or inst:IsA("TextButton") or inst:IsA("TextBox") then
-		inst.Text        = ""
-		inst.Font        = Theme.Font
-		inst.TextColor3  = Theme.Text
-		inst.TextSize    = 14
+		inst.Text = ""
+		inst.Font = Theme.Font
+		inst.TextColor3 = Theme.Text
+		inst.TextSize = 14
 	end
 	if props then
 		if props.BackgroundColor3 and props.BackgroundTransparency == nil then
@@ -268,8 +268,8 @@ local function stroke(color, thickness, transparency)
 end
 local function padding(l, t, r, b)
 	return create("UIPadding", {
-		PaddingLeft   = UDim.new(0, l), PaddingTop    = UDim.new(0, t),
-		PaddingRight  = UDim.new(0, r), PaddingBottom = UDim.new(0, b),
+		PaddingLeft = UDim.new(0, l), PaddingTop = UDim.new(0, t),
+		PaddingRight = UDim.new(0, r), PaddingBottom = UDim.new(0, b),
 	})
 end
 local function rgbString(c)
@@ -300,16 +300,16 @@ end
 
 local function ripple(face, input)
 	local point = Vector2.new(input.Position.X, input.Position.Y) + GuiService:GetGuiInset()
-	local rel   = (point - face.AbsolutePosition) / face.AbsoluteSize
+	local rel = (point - face.AbsolutePosition) / face.AbsoluteSize
 	local r = create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position    = UDim2.fromScale(math.clamp(rel.X, 0, 1), math.clamp(rel.Y, 0, 1)),
-		Size        = UDim2.fromScale(0, 0),
+		Position = UDim2.fromScale(math.clamp(rel.X, 0, 1), math.clamp(rel.Y, 0, 1)),
+		Size = UDim2.fromScale(0, 0),
 		SizeConstraint = Enum.SizeConstraint.RelativeXX,
-		BackgroundColor3    = Color3.new(1, 1, 1),
+		BackgroundColor3 = Color3.new(1, 1, 1),
 		BackgroundTransparency = 0.72,
-		ZIndex      = 4,
-		Parent      = face,
+		ZIndex = 4,
+		Parent = face,
 	}, { pill() })
 	A(r, "Size", UDim2.fromScale(2.6, 2.6), { 12, 1 })
 	A(r, "BackgroundTransparency", 1, { 9, 1 })
@@ -340,7 +340,7 @@ local function rgbToHsv(c)
 	local r, g, b = c.R, c.G, c.B
 	local max = math.max(r, g, b)
 	local min = math.min(r, g, b)
-	local d   = max - min
+	local d = max - min
 	local h, s, v = 0, (max == 0 and 0 or d/max), max
 	if d ~= 0 then
 		if     max == r then h = (g - b) / d % 6
@@ -382,32 +382,32 @@ local tooltipLabel
 
 local function ensureTooltip()
 	if tooltipFrame and tooltipFrame.Parent then return end
-	tooltipGui   = Nova.ScreenGui("NovaTooltip", 1100)
+	tooltipGui = Nova.ScreenGui("NovaTooltip", 1100)
 	tooltipFrame = create("Frame", {
-		Size             = UDim2.fromOffset(0, 0),
-		AutomaticSize    = Enum.AutomaticSize.XY,
+		Size = UDim2.fromOffset(0, 0),
+		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundColor3 = Theme.Surface,
-		Visible          = false,
-		ZIndex           = 99,
-		Parent           = tooltipGui,
+		Visible = false,
+		ZIndex = 99,
+		Parent = tooltipGui,
 	}, { corner(6), stroke(Theme.Stroke, 1, 0.3), padding(10, 5, 10, 5) })
 	tooltipLabel = create("TextLabel", {
-		Size           = UDim2.fromOffset(0, 0),
-		AutomaticSize  = Enum.AutomaticSize.XY,
-		Text           = "",
-		TextSize       = 12,
-		TextColor3     = Theme.SubText,
-		TextWrapped    = false,
+		Size = UDim2.fromOffset(0, 0),
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Text = "",
+		TextSize = 12,
+		TextColor3 = Theme.SubText,
+		TextWrapped = false,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		ZIndex         = 99,
-		Parent         = tooltipFrame,
+		ZIndex = 99,
+		Parent = tooltipFrame,
 	})
 end
 
 local tooltipConn
 local function showTooltip(text)
 	ensureTooltip()
-	tooltipLabel.Text    = text
+	tooltipLabel.Text = text
 	tooltipFrame.Visible = true
 	if tooltipConn then tooltipConn:Disconnect() end
 	tooltipConn = RunService.RenderStepped:Connect(function()
@@ -452,12 +452,12 @@ function Nova.ScreenGui(name, displayOrder)
 		parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 	end
 	return create("ScreenGui", {
-		Name            = name or "NovaUI",
-		ResetOnSpawn    = false,
-		IgnoreGuiInset  = true,
-		ZIndexBehavior  = Enum.ZIndexBehavior.Sibling,
-		DisplayOrder    = displayOrder or 10,
-		Parent          = parent,
+		Name = name or "NovaUI",
+		ResetOnSpawn = false,
+		IgnoreGuiInset = true,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		DisplayOrder = displayOrder or 10,
+		Parent = parent,
 	})
 end
 
@@ -475,10 +475,10 @@ end
 function Container:_card(height, bare)
 	self._order += 1
 	local card = create("Frame", {
-		Size            = UDim2.new(1, 0, 0, height),
-		LayoutOrder     = self._order,
+		Size = UDim2.new(1, 0, 0, height),
+		LayoutOrder = self._order,
 		BackgroundColor3= if bare then nil else Theme.Surface,
-		Parent          = self.Scroll,
+		Parent = self.Scroll,
 	})
 	if not bare then
 		corner(8).Parent = card
@@ -503,14 +503,14 @@ end
 function Container:AddSection(text)
 	local card = self:_card(26, true)
 	create("TextLabel", {
-		Size             = UDim2.fromScale(1, 1),
-		Text             = string.upper(text or "Section"),
-		Font             = Theme.FontBold,
-		TextSize         = 11,
-		TextColor3       = Theme.Accent,
-		TextXAlignment   = Enum.TextXAlignment.Left,
-		TextYAlignment   = Enum.TextYAlignment.Bottom,
-		Parent           = card,
+		Size = UDim2.fromScale(1, 1),
+		Text = string.upper(text or "Section"),
+		Font = Theme.FontBold,
+		TextSize = 11,
+		TextColor3 = Theme.Accent,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Bottom,
+		Parent = card,
 	}, { padding(4, 0, 0, 2) })
 	return { Frame = card }
 end
@@ -520,18 +520,18 @@ function Container:AddLabel(text)
 	card.AutomaticSize = Enum.AutomaticSize.Y
 	padding(14, 11, 14, 11).Parent = card
 	local lbl = create("TextLabel", {
-		Size           = UDim2.new(1, 0, 0, 0),
-		AutomaticSize  = Enum.AutomaticSize.Y,
-		Text           = text or "",
-		TextColor3     = Theme.SubText,
-		TextWrapped    = true,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Text = text or "",
+		TextColor3 = Theme.SubText,
+		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Top,
-		Parent         = card,
+		Parent = card,
 	})
 	return {
 		Frame = card,
-		Set   = function(_, t) lbl.Text = t end,
+		Set = function(_, t) lbl.Text = t end,
 	}
 end
 
@@ -540,27 +540,27 @@ function Container:AddButton(o)
 	local card, scale = self:_card(40, true)
 
 	local grad = create("UIGradient", {
-		Color    = ColorSequence.new(Theme.Accent, Theme.AccentAlt),
+		Color = ColorSequence.new(Theme.Accent, Theme.AccentAlt),
 		Rotation = 20,
 	})
 	local face = create("Frame", {
-		Size             = UDim2.fromScale(1, 1),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.new(1, 1, 1),
-		Parent           = card,
+		Parent = card,
 	}, { corner(8), grad })
 
 	local label = create("TextLabel", {
-		Size           = UDim2.fromScale(1, 1),
-		Text           = o.Text or "Button",
-		Font           = Theme.FontBold,
-		TextColor3     = Color3.new(1, 1, 1),
+		Size = UDim2.fromScale(1, 1),
+		Text = o.Text or "Button",
+		Font = Theme.FontBold,
+		TextColor3 = Color3.new(1, 1, 1),
 		BackgroundTransparency = 1,
-		ZIndex         = 3,
-		Parent         = face,
+		ZIndex = 3,
+		Parent = face,
 	})
 
 	local hit = create("TextButton", {
-		Size   = UDim2.fromScale(1, 1),
+		Size = UDim2.fromScale(1, 1),
 		ZIndex = 5,
 		Parent = face,
 	})
@@ -583,7 +583,7 @@ function Container:AddButton(o)
 	end)
 
 	return {
-		Frame   = card,
+		Frame = card,
 		SetText = function(_, t) label.Text = t end,
 	}
 end
@@ -593,28 +593,28 @@ function Container:AddToggle(o)
 	local card, scale = self:_card(44)
 	create("TextLabel", {
 		Position = UDim2.fromOffset(14, 0),
-		Size     = UDim2.new(1, -80, 1, 0),
-		Text     = o.Text or "Toggle",
+		Size = UDim2.new(1, -80, 1, 0),
+		Text = o.Text or "Toggle",
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Parent   = card,
+		Parent = card,
 	})
 	local track = create("Frame", {
-		AnchorPoint      = Vector2.new(1, 0.5),
-		Position         = UDim2.new(1, -14, 0.5, 0),
-		Size             = UDim2.fromOffset(44, 24),
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -14, 0.5, 0),
+		Size = UDim2.fromOffset(44, 24),
 		BackgroundColor3 = Theme.Stroke,
-		Parent           = card,
+		Parent = card,
 	}, { pill() })
 	local knob = create("Frame", {
-		AnchorPoint      = Vector2.new(0, 0.5),
-		Position         = UDim2.new(0, 3, 0.5, 0),
-		Size             = UDim2.fromOffset(18, 18),
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 3, 0.5, 0),
+		Size = UDim2.fromOffset(18, 18),
 		BackgroundColor3 = Theme.Text,
-		Parent           = track,
+		Parent = track,
 	}, { pill() })
 	local hit = create("TextButton", { Size = UDim2.fromScale(1, 1), ZIndex = 5, Parent = card })
 
-	local state   = o.Default == true
+	local state = o.Default == true
 	local pressed = false
 
 	local function render(instant)
@@ -643,8 +643,8 @@ function Container:AddToggle(o)
 
 	return {
 		Frame = card,
-		Get   = function()    return state end,
-		Set   = function(_, v) set(v == true, true) end,
+		Get = function()    return state end,
+		Set = function(_, v) set(v == true, true) end,
 	}
 end
 
@@ -652,7 +652,7 @@ function Container:AddSlider(o)
 	o = o or {}
 	local min, max, inc = o.Min or 0, o.Max or 100, o.Increment or 1
 	local suffix = o.Suffix or ""
-	local value  = math.clamp(o.Default or min, min, max)
+	local value = math.clamp(o.Default or min, min, max)
 	local card, scale = self:_card(58)
 
 	create("TextLabel", {
@@ -662,7 +662,7 @@ function Container:AddSlider(o)
 	})
 	local valueLabel = create("TextLabel", {
 		AnchorPoint = Vector2.new(1, 0),
-		Position    = UDim2.new(1, -14, 0, 8), Size = UDim2.fromOffset(80, 18),
+		Position = UDim2.new(1, -14, 0, 8), Size = UDim2.fromOffset(80, 18),
 		Font = Theme.FontBold, TextColor3 = Theme.Accent,
 		TextXAlignment = Enum.TextXAlignment.Right, Parent = card,
 	})
@@ -728,8 +728,8 @@ function Container:AddSlider(o)
 
 	return {
 		Frame = card,
-		Get   = function()     return value end,
-		Set   = function(_, v) setValue(v, true) end,
+		Get = function()     return value end,
+		Set = function(_, v) setValue(v, true) end,
 	}
 end
 
@@ -742,20 +742,20 @@ function Container:AddTextInput(o)
 		Parent = card,
 	})
 	local box = create("TextBox", {
-		AnchorPoint      = Vector2.new(1, 0.5),
-		Position         = UDim2.new(1, -8, 0.5, 0),
-		Size             = UDim2.fromOffset(170, 28),
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -8, 0.5, 0),
+		Size = UDim2.fromOffset(170, 28),
 		BackgroundColor3 = Theme.Background,
-		Text             = o.Default or "",
-		PlaceholderText  = o.Placeholder or "",
+		Text = o.Default or "",
+		PlaceholderText = o.Placeholder or "",
 		PlaceholderColor3= Theme.SubText,
-		TextXAlignment   = Enum.TextXAlignment.Left,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		ClearTextOnFocus = false,
 		ClipsDescendants = true,
-		Parent           = card,
+		Parent = card,
 	}, { corner(6), padding(10, 0, 10, 0) })
-	local border   = stroke(Theme.Stroke, 1, 0)
-	border.Parent  = box
+	local border = stroke(Theme.Stroke, 1, 0)
+	border.Parent = box
 	local boxScale = create("UIScale", { Parent = box })
 
 	box.Focused:Connect(function()
@@ -774,8 +774,8 @@ function Container:AddTextInput(o)
 
 	return {
 		Frame = card,
-		Get   = function() return box.Text end,
-		Set   = function(_, t)
+		Get = function() return box.Text end,
+		Set = function(_, t)
 			box.Text = t
 			if o.Callback then task.spawn(o.Callback, t, true) end
 		end,
@@ -784,7 +784,7 @@ end
 
 function Container:AddDropdown(o)
 	o = o or {}
-	local options  = {}
+	local options = {}
 	for _, v in (o.Options or {}) do table.insert(options, v) end
 	local selected = o.Default
 	local HEAD, OPT = 44, 30
@@ -797,29 +797,29 @@ function Container:AddDropdown(o)
 		Parent = card,
 	})
 	local valueLabel = create("TextLabel", {
-		AnchorPoint    = Vector2.new(1, 0),
-		Position       = UDim2.new(1, -36, 0, 0), Size = UDim2.new(0.5, -36, 0, HEAD),
-		Text           = selected ~= nil and tostring(selected) or "Select…",
-		TextColor3     = Theme.SubText, TextXAlignment = Enum.TextXAlignment.Right,
-		TextTruncate   = Enum.TextTruncate.AtEnd, Parent = card,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -36, 0, 0), Size = UDim2.new(0.5, -36, 0, HEAD),
+		Text = selected ~= nil and tostring(selected) or "Select…",
+		TextColor3 = Theme.SubText, TextXAlignment = Enum.TextXAlignment.Right,
+		TextTruncate = Enum.TextTruncate.AtEnd, Parent = card,
 	})
 	local chevron = create("TextLabel", {
 		AnchorPoint = Vector2.new(1, 0),
-		Position    = UDim2.new(1, -12, 0, 0), Size = UDim2.fromOffset(18, HEAD),
+		Position = UDim2.new(1, -12, 0, 0), Size = UDim2.fromOffset(18, HEAD),
 		Text = "▾", TextSize = 16, TextColor3 = Theme.SubText, Parent = card,
 	})
 	local list = create("ScrollingFrame", {
-		Position              = UDim2.fromOffset(8, HEAD),
-		Size                  = UDim2.new(1, -16, 0, 0),
-		CanvasSize            = UDim2.new(),
-		AutomaticCanvasSize   = Enum.AutomaticSize.Y,
-		ScrollBarThickness    = 2,
-		ScrollBarImageColor3  = Theme.Accent,
-		Parent                = card,
+		Position = UDim2.fromOffset(8, HEAD),
+		Size = UDim2.new(1, -16, 0, 0),
+		CanvasSize = UDim2.new(),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		ScrollBarThickness = 2,
+		ScrollBarImageColor3 = Theme.Accent,
+		Parent = card,
 	}, { create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }) })
 	local hit = create("TextButton", { Size = UDim2.new(1, 0, 0, HEAD), ZIndex = 5, Parent = card })
 
-	local open    = false
+	local open = false
 	local buttons = {}
 
 	local function listHeight()
@@ -852,15 +852,15 @@ function Container:AddDropdown(o)
 		list.Size = UDim2.new(1, -16, 0, listHeight())
 		for i, opt in options do
 			local b = create("TextButton", {
-				Name               = tostring(opt),
-				Size               = UDim2.new(1, -4, 0, OPT),
-				LayoutOrder        = i,
-				BackgroundColor3   = Theme.SurfaceHover,
+				Name = tostring(opt),
+				Size = UDim2.new(1, -4, 0, OPT),
+				LayoutOrder = i,
+				BackgroundColor3 = Theme.SurfaceHover,
 				BackgroundTransparency = 1,
-				Text               = tostring(opt),
-				TextColor3         = (opt == selected) and Theme.Accent or Theme.Text,
-				TextXAlignment     = Enum.TextXAlignment.Left,
-				Parent             = list,
+				Text = tostring(opt),
+				TextColor3 = (opt == selected) and Theme.Accent or Theme.Text,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = list,
 			}, { corner(6), padding(10, 0, 0, 0) })
 			b.MouseEnter:Connect(function()  A(b, "BackgroundTransparency", 0, P.Snappy) end)
 			b.MouseLeave:Connect(function()  A(b, "BackgroundTransparency", 1, P.Snappy) end)
@@ -878,15 +878,15 @@ function Container:AddDropdown(o)
 
 	local function addOptionButton(opt, idx)
 		local b = create("TextButton", {
-			Name               = tostring(opt),
-			Size               = UDim2.new(1, -4, 0, OPT),
-			LayoutOrder        = idx,
-			BackgroundColor3   = Theme.SurfaceHover,
+			Name = tostring(opt),
+			Size = UDim2.new(1, -4, 0, OPT),
+			LayoutOrder = idx,
+			BackgroundColor3 = Theme.SurfaceHover,
 			BackgroundTransparency = 1,
-			Text               = tostring(opt),
-			TextColor3         = (opt == selected) and Theme.Accent or Theme.Text,
-			TextXAlignment     = Enum.TextXAlignment.Left,
-			Parent             = list,
+			Text = tostring(opt),
+			TextColor3 = (opt == selected) and Theme.Accent or Theme.Text,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = list,
 		}, { corner(6), padding(10, 0, 0, 0) })
 		b.MouseEnter:Connect(function()  A(b, "BackgroundTransparency", 0, P.Snappy) end)
 		b.MouseLeave:Connect(function()  A(b, "BackgroundTransparency", 1, P.Snappy) end)
@@ -904,8 +904,8 @@ function Container:AddDropdown(o)
 
 	return {
 		Frame = card,
-		Get   = function() return selected end,
-		Set   = function(_, v) choose(v, true) end,
+		Get = function() return selected end,
+		Set = function(_, v) choose(v, true) end,
 
 		SetOptions = function(_, newOptions)
 			options = {}
@@ -949,9 +949,9 @@ end
 
 function Container:AddMultiDropdown(o)
 	o = o or {}
-	local options  = {}
+	local options = {}
 	for _, v in (o.Options or {}) do table.insert(options, v) end
-	local maxSel   = o.Max
+	local maxSel = o.Max
 
 	local selected = {}
 	for _, v in (o.Default or {}) do selected[v] = true end
@@ -966,29 +966,29 @@ function Container:AddMultiDropdown(o)
 		Parent = card,
 	})
 	local valueLabel = create("TextLabel", {
-		AnchorPoint  = Vector2.new(1, 0),
-		Position     = UDim2.new(1, -36, 0, 0), Size = UDim2.new(0.5, -36, 0, HEAD),
-		Text         = "None", TextColor3 = Theme.SubText,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -36, 0, 0), Size = UDim2.new(0.5, -36, 0, HEAD),
+		Text = "None", TextColor3 = Theme.SubText,
 		TextXAlignment = Enum.TextXAlignment.Right,
 		TextTruncate = Enum.TextTruncate.AtEnd, Parent = card,
 	})
 	local chevron = create("TextLabel", {
 		AnchorPoint = Vector2.new(1, 0),
-		Position    = UDim2.new(1, -12, 0, 0), Size = UDim2.fromOffset(18, HEAD),
+		Position = UDim2.new(1, -12, 0, 0), Size = UDim2.fromOffset(18, HEAD),
 		Text = "▾", TextSize = 16, TextColor3 = Theme.SubText, Parent = card,
 	})
 	local list = create("ScrollingFrame", {
-		Position             = UDim2.fromOffset(8, HEAD),
-		Size                 = UDim2.new(1, -16, 0, 0),
-		CanvasSize           = UDim2.new(),
-		AutomaticCanvasSize  = Enum.AutomaticSize.Y,
-		ScrollBarThickness   = 2,
+		Position = UDim2.fromOffset(8, HEAD),
+		Size = UDim2.new(1, -16, 0, 0),
+		CanvasSize = UDim2.new(),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		ScrollBarThickness = 2,
 		ScrollBarImageColor3 = Theme.Accent,
-		Parent               = card,
+		Parent = card,
 	}, { create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }) })
 	local hit = create("TextButton", { Size = UDim2.new(1, 0, 0, HEAD), ZIndex = 5, Parent = card })
 
-	local open    = false
+	local open = false
 	local buttons = {}
 
 	local function summaryText()
@@ -1030,33 +1030,33 @@ function Container:AddMultiDropdown(o)
 		for i, opt in options do
 			local isOn = selected[opt] == true
 			local b = create("TextButton", {
-				Name               = tostring(opt),
-				Size               = UDim2.new(1, -4, 0, OPT),
-				LayoutOrder        = i,
-				BackgroundColor3   = Theme.SurfaceHover,
+				Name = tostring(opt),
+				Size = UDim2.new(1, -4, 0, OPT),
+				LayoutOrder = i,
+				BackgroundColor3 = Theme.SurfaceHover,
 				BackgroundTransparency = 1,
-				Text               = tostring(opt),
-				TextColor3         = isOn and Theme.Accent or Theme.Text,
-				TextXAlignment     = Enum.TextXAlignment.Left,
-				Parent             = list,
+				Text = tostring(opt),
+				TextColor3 = isOn and Theme.Accent or Theme.Text,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = list,
 			}, { corner(6), padding(34, 0, 0, 0) })
 			b:SetAttribute("_val", tostring(opt))
 			local chk = create("Frame", {
-				Name             = "_check",
-				AnchorPoint      = Vector2.new(0, 0.5),
-				Position         = UDim2.new(0, -24, 0.5, 0),
-				Size             = UDim2.fromOffset(16, 16),
+				Name = "_check",
+				AnchorPoint = Vector2.new(0, 0.5),
+				Position = UDim2.new(0, -24, 0.5, 0),
+				Size = UDim2.fromOffset(16, 16),
 				BackgroundColor3 = isOn and Theme.Accent or Theme.Stroke,
-				Parent           = b,
+				Parent = b,
 			}, { corner(4) })
 			local tick = create("TextLabel", {
-				Size       = UDim2.fromScale(1, 1),
-				Text       = "✓",
-				TextSize   = 11,
-				Font       = Theme.FontBold,
+				Size = UDim2.fromScale(1, 1),
+				Text = "✓",
+				TextSize = 11,
+				Font = Theme.FontBold,
 				TextColor3 = Color3.new(1, 1, 1),
 				BackgroundTransparency = 1,
-				Parent     = chk,
+				Parent = chk,
 			})
 			tick.Visible = isOn
 
@@ -1098,12 +1098,12 @@ function Container:AddMultiDropdown(o)
 
 	return {
 		Frame = card,
-		Get   = function()
+		Get = function()
 			local t = {}
 			for _, v in options do if selected[v] then table.insert(t, v) end end
 			return t
 		end,
-		Set   = function(_, newSel)
+		Set = function(_, newSel)
 			selected = {}
 			for _, v in newSel do selected[v] = true end
 			rebuild()
@@ -1141,12 +1141,12 @@ end
 
 function Container:AddColorPicker(o)
 	o = o or {}
-	local HEAD      = 44
-	local EXPANDED  = 44 + 160 + 8
+	local HEAD = 44
+	local EXPANDED = 44 + 160 + 8
 	local card, scale = self:_card(HEAD)
 	card.ClipsDescendants = true
 
-	local color   = o.Default or Color3.fromRGB(124, 92, 255)
+	local color = o.Default or Color3.fromRGB(124, 92, 255)
 	local h, s, v = rgbToHsv(color)
 
 	create("TextLabel", {
@@ -1155,31 +1155,31 @@ function Container:AddColorPicker(o)
 		Parent = card,
 	})
 	local swatch = create("Frame", {
-		AnchorPoint      = Vector2.new(1, 0.5),
-		Position         = UDim2.new(1, -36, 0.5, 0),
-		Size             = UDim2.fromOffset(44, 24),
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -36, 0.5, 0),
+		Size = UDim2.fromOffset(44, 24),
 		BackgroundColor3 = color,
-		Parent           = card,
+		Parent = card,
 	}, { corner(6), stroke(Theme.Stroke, 1, 0.3) })
 	local chevron = create("TextLabel", {
 		AnchorPoint = Vector2.new(1, 0),
-		Position    = UDim2.new(1, -12, 0, 0), Size = UDim2.fromOffset(18, HEAD),
+		Position = UDim2.new(1, -12, 0, 0), Size = UDim2.fromOffset(18, HEAD),
 		Text = "▾", TextSize = 16, TextColor3 = Theme.SubText, Parent = card,
 	})
 	local hit = create("TextButton", { Size = UDim2.new(1, 0, 0, HEAD), ZIndex = 5, Parent = card })
 
 	local body = create("Frame", {
 		Position = UDim2.new(0, 8, 0, HEAD + 4),
-		Size     = UDim2.new(1, -16, 0, 152),
+		Size = UDim2.new(1, -16, 0, 152),
 		BackgroundTransparency = 1,
-		Parent   = card,
+		Parent = card,
 	})
 
 	local sqSize = 128
 	local sq = create("Frame", {
-		Size             = UDim2.fromOffset(sqSize, sqSize),
+		Size = UDim2.fromOffset(sqSize, sqSize),
 		BackgroundColor3 = Color3.new(1, 0, 0),
-		Parent           = body,
+		Parent = body,
 	}, { corner(6) })
 	local sqWhite = create("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -1187,8 +1187,12 @@ function Container:AddColorPicker(o)
 		Parent = sq,
 	}, { corner(6), create("UIGradient", {
 		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.new(1,1,1)),
-			ColorSequenceKeypoint.new(1, Color3.new(1,1,1,0)),
+			ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+			ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1)),
+		}),
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0),
+			NumberSequenceKeypoint.new(1, 1),
 		}),
 	}) })
 	local sqBlack = create("Frame", {
@@ -1203,17 +1207,17 @@ function Container:AddColorPicker(o)
 		}),
 	}) })
 	local svCursor = create("Frame", {
-		AnchorPoint      = Vector2.new(0.5, 0.5),
-		Size             = UDim2.fromOffset(12, 12),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Size = UDim2.fromOffset(12, 12),
 		BackgroundColor3 = Color3.new(1, 1, 1),
-		ZIndex           = 5,
-		Parent           = sq,
+		ZIndex = 5,
+		Parent = sq,
 	}, { pill(), stroke(Color3.new(0,0,0), 1, 0) })
 
 	local hStrip = create("Frame", {
 		Position = UDim2.fromOffset(sqSize + 8, 0),
-		Size     = UDim2.fromOffset(12, sqSize),
-		Parent   = body,
+		Size = UDim2.fromOffset(12, sqSize),
+		Parent = body,
 	}, { corner(6) })
 	local hGrad = create("UIGradient", {
 		Rotation = 90,
@@ -1230,32 +1234,32 @@ function Container:AddColorPicker(o)
 	})
 	hStrip.BackgroundColor3 = Color3.new(1,1,1)
 	local hCursor = create("Frame", {
-		AnchorPoint      = Vector2.new(0.5, 0.5),
-		Size             = UDim2.new(1, 4, 0, 4),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Size = UDim2.new(1, 4, 0, 4),
 		BackgroundColor3 = Color3.new(1, 1, 1),
-		ZIndex           = 5,
-		Parent           = hStrip,
+		ZIndex = 5,
+		Parent = hStrip,
 	}, { pill(), stroke(Color3.new(0,0,0), 1, 0) })
 
 	local hexBox = create("TextBox", {
-		Position         = UDim2.new(0, 0, 0, sqSize + 8),
-		Size             = UDim2.new(1, 0, 0, 26),
+		Position = UDim2.new(0, 0, 0, sqSize + 8),
+		Size = UDim2.new(1, 0, 0, 26),
 		BackgroundColor3 = Theme.Background,
-		Text             = colorToHex(color),
-		PlaceholderText  = "RRGGBB",
+		Text = colorToHex(color),
+		PlaceholderText = "RRGGBB",
 		PlaceholderColor3= Theme.SubText,
-		TextXAlignment   = Enum.TextXAlignment.Left,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		ClearTextOnFocus = false,
-		Parent           = body,
+		Parent = body,
 	}, { corner(6), padding(8, 0, 8, 0), stroke(Theme.Stroke, 1, 0) })
 
 	local function applyColor(fireCallback)
 		color = hsvToRgb(h, s, v)
 		swatch.BackgroundColor3 = color
-		sq.BackgroundColor3     = Color3.fromHSV(h, 1, 1)
+		sq.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
 		svCursor.Position = UDim2.fromScale(s, 1 - v)
-		hCursor.Position  = UDim2.new(0.5, 0, h, 0)
-		hexBox.Text       = colorToHex(color)
+		hCursor.Position = UDim2.new(0.5, 0, h, 0)
+		hexBox.Text = colorToHex(color)
 		if fireCallback and o.Callback then task.spawn(o.Callback, color) end
 	end
 	applyColor(false)
@@ -1320,8 +1324,8 @@ function Container:AddColorPicker(o)
 
 	return {
 		Frame = card,
-		Get   = function() return color end,
-		Set   = function(_, c)
+		Get = function() return color end,
+		Set = function(_, c)
 			h, s, v = rgbToHsv(c)
 			applyColor(true)
 		end,
@@ -1330,7 +1334,7 @@ end
 
 function Container:AddKeybind(o)
 	o = o or {}
-	local bound    = o.Default or Enum.KeyCode.Unknown
+	local bound = o.Default or Enum.KeyCode.Unknown
 	local card, scale = self:_card(44)
 	local listening = false
 
@@ -1341,16 +1345,16 @@ function Container:AddKeybind(o)
 	})
 
 	local btn = create("TextButton", {
-		AnchorPoint      = Vector2.new(1, 0.5),
-		Position         = UDim2.new(1, -10, 0.5, 0),
-		Size             = UDim2.fromOffset(130, 28),
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -10, 0.5, 0),
+		Size = UDim2.fromOffset(130, 28),
 		BackgroundColor3 = Theme.Background,
-		Text             = keyName(bound),
-		Font             = Theme.FontBold,
-		TextSize         = 13,
-		Parent           = card,
+		Text = keyName(bound),
+		Font = Theme.FontBold,
+		TextSize = 13,
+		Parent = card,
 	}, { corner(6), stroke(Theme.Stroke, 1, 0) })
-	local btnScale  = create("UIScale", { Parent = btn })
+	local btnScale = create("UIScale", { Parent = btn })
 	local bdrStroke = btn:FindFirstChildWhichIsA("UIStroke")
 
 	local hitCard = create("TextButton", { Size = UDim2.new(1, -150, 1, 0), ZIndex = 5, Parent = card })
@@ -1404,9 +1408,9 @@ function Container:AddKeybind(o)
 	end)
 
 	return {
-		Frame  = card,
-		Get    = function() return bound end,
-		Set    = function(_, key)
+		Frame = card,
+		Get = function() return bound end,
+		Set = function(_, key)
 			bound = key
 			btn.Text = keyName(key)
 			if o.Callback then task.spawn(o.Callback, key) end
@@ -1446,7 +1450,7 @@ function Container:AddProgress(o)
 
 	return {
 		Frame = card,
-		Set   = function(_, a) set(a, false) end,
+		Set = function(_, a) set(a, false) end,
 	}
 end
 
@@ -1463,9 +1467,9 @@ local function hasFS()
 	    and type(isfile)    == "function"
 end
 
-local _folderReady = false
+local _folderReady = {}
 local function ensureFolder(folder)
-	if _folderReady then return end
+	if _folderReady[folder] then return end
 	pcall(function()
 		if type(isfolder) == "function" and not isfolder(folder) then
 			if type(makefolder) == "function" then
@@ -1473,11 +1477,11 @@ local function ensureFolder(folder)
 			end
 		end
 	end)
-	_folderReady = true
+	_folderReady[folder] = true
 end
 
 local Storage = {}
-Nova.Storage  = Storage
+Nova.Storage = Storage
 
 Storage.Folder = "NovaUI"   -- no trailing slash; joined below
 
@@ -1488,14 +1492,14 @@ end
 local function getRSFolder(namespace)
 	local root = ReplicatedStorage:FindFirstChild("NovaUI")
 	if not root then
-		root        = Instance.new("Folder")
-		root.Name   = "NovaUI"
+		root = Instance.new("Folder")
+		root.Name = "NovaUI"
 		root.Parent = ReplicatedStorage
 	end
 	local ns = root:FindFirstChild(namespace)
 	if not ns then
-		ns        = Instance.new("Folder")
-		ns.Name   = namespace
+		ns = Instance.new("Folder")
+		ns.Name = namespace
 		ns.Parent = root
 	end
 	return ns
@@ -1510,10 +1514,10 @@ function Storage.Save(namespace, key, data)
 		end
 	else
 		local folder = getRSFolder(namespace)
-		local sv     = folder:FindFirstChild(key)
+		local sv = folder:FindFirstChild(key)
 		if not sv then
-			sv        = Instance.new("StringValue")
-			sv.Name   = key
+			sv = Instance.new("StringValue")
+			sv.Name = key
 			sv.Parent = folder
 		end
 		sv.Value = data
@@ -1534,7 +1538,7 @@ function Storage.Load(namespace, key)
 		return data
 	else
 		local folder = getRSFolder(namespace)
-		local sv     = folder:FindFirstChild(key)
+		local sv = folder:FindFirstChild(key)
 		return (sv and sv.Value ~= "") and sv.Value or nil
 	end
 end
@@ -1650,7 +1654,7 @@ end
 
 JSON.encode = jsonEncode
 JSON.decode = jsonDecode
-Nova.JSON   = JSON
+Nova.JSON = JSON
 
 local function serializeValue(val)
 	local t = typeof(val)
@@ -1686,37 +1690,43 @@ end
 local function actionRow(parent, btns, cards)
 	create("UIListLayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
-		Padding       = UDim.new(0, 6),
-		SortOrder     = Enum.SortOrder.LayoutOrder,
-		Parent        = parent,
+		Padding = UDim.new(0, 6),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Parent = parent,
 	})
 	padding(0, 4, 0, 4).Parent = parent
 	local n = #btns
 	for i, b in btns do
 		local grad = create("UIGradient", {
-			Color    = ColorSequence.new(b[2], Theme.AccentAlt),
+			Color = ColorSequence.new(b[2], Theme.AccentAlt),
 			Rotation = 20,
 		})
 		local face = create("Frame", {
-			Size             = UDim2.new(1/n, if n > 1 then -math.ceil(6*(n-1)/n) else 0, 1, 0),
+			Size = UDim2.new(1/n, if n > 1 then -math.ceil(6*(n-1)/n) else 0, 1, 0),
 			BackgroundColor3 = Color3.new(1,1,1),
-			LayoutOrder      = i,
-			Parent           = parent,
+			LayoutOrder = i,
+			Parent = parent,
 		}, { corner(7), grad })
 		create("TextLabel", {
-			Size       = UDim2.fromScale(1,1),
-			Text       = b[1],
-			Font       = Theme.FontBold,
+			Size = UDim2.fromScale(1,1),
+			Text = b[1],
+			Font = Theme.FontBold,
 			TextColor3 = Color3.new(1,1,1),
-			TextSize   = 12,
-			ZIndex     = 3,
-			Parent     = face,
+			TextSize = 12,
+			ZIndex = 3,
+			Parent = face,
 		})
-		local sc  = create("UIScale", { Parent = face })
+		local sc = create("UIScale", { Parent = face })
 		if cards then table.insert(cards, sc) end
 		local hit = create("TextButton", { Size = UDim2.fromScale(1,1), ZIndex = 5, Parent = face })
-		hit.MouseEnter:Connect(function()       A(sc, "Scale", 1.04, P.Bouncy) end)
-		hit.MouseLeave:Connect(function()       A(sc, "Scale", 1,    P.Snappy) end)
+		hit.MouseEnter:Connect(function()
+			A(sc,   "Scale",    1.04, P.Bouncy)
+			A(grad, "Rotation", 110,  { 10, 1 })
+		end)
+		hit.MouseLeave:Connect(function()
+			A(sc,   "Scale",    1,   P.Snappy)
+			A(grad, "Rotation", 20,  { 10, 1 })
+		end)
 		hit.MouseButton1Down:Connect(function() A(sc, "Scale", 0.94, P.Snappy) end)
 		hit.MouseButton1Up:Connect(function()   A(sc, "Scale", 1.04, P.Bouncy) end)
 		hit.InputBegan:Connect(function(inp) if isPress(inp) then ripple(face, inp) end end)
@@ -1733,7 +1743,7 @@ local AUTO_REGISTER_METHODS = {
 	"AddMultiDropdown","AddColorPicker","AddKeybind",
 }
 
-local NS_GAME   = "NovaConfig_" .. tostring(game.PlaceId)
+local NS_GAME = "NovaConfig_" .. tostring(game.PlaceId)
 local NS_GLOBAL = "NovaConfig_Global"
 
 local Config = {}
@@ -1741,17 +1751,17 @@ Config.__index = Config
 
 local function _newConfig(namespace)
 	return setmetatable({
-		_namespace     = namespace,
-		_entries       = {},
+		_namespace = namespace,
+		_entries = {},
 		_activeProfile = nil,
 	}, Config)
 end
 
-local _cfgGame   = _newConfig(NS_GAME)
+local _cfgGame = _newConfig(NS_GAME)
 local _cfgGlobal = _newConfig(NS_GLOBAL)
-Nova._cfgGame   = _cfgGame
+Nova._cfgGame = _cfgGame
 Nova._cfgGlobal = _cfgGlobal
-Nova._cfg       = _cfgGame
+Nova._cfg = _cfgGame
 
 for _, method in AUTO_REGISTER_METHODS do
 	local original = Container[method]
@@ -1898,8 +1908,8 @@ local function buildConfigUI(tab, cfg, selectorComp, nameInput)
 			return
 		end
 		Nova.Dialog{
-			Title   = 'Overwrite "'..tostring(sel)..'"?',
-			Text    = "This will replace its saved values.",
+			Title = 'Overwrite "'..tostring(sel)..'"?',
+			Text = "This will replace its saved values.",
 			Buttons = {
 				{ Text = "Overwrite", Primary = true, Callback = function()
 					if cfg:SaveProfile(sel) then
@@ -1919,8 +1929,8 @@ local function buildConfigUI(tab, cfg, selectorComp, nameInput)
 		end
 		if cfg:_profileExists(name) then
 			Nova.Dialog{
-				Title   = 'Profile "'..name..'" exists',
-				Text    = "Overwrite it?",
+				Title = 'Profile "'..name..'" exists',
+				Text = "Overwrite it?",
 				Buttons = {
 					{ Text = "Overwrite", Primary = true, Callback = function()
 						if cfg:SaveProfile(name) then
@@ -1961,8 +1971,8 @@ local function buildConfigUI(tab, cfg, selectorComp, nameInput)
 			return
 		end
 		Nova.Dialog{
-			Title   = 'Delete "'..tostring(sel)..'"?',
-			Text    = "This cannot be undone.",
+			Title = 'Delete "'..tostring(sel)..'"?',
+			Text = "This cannot be undone.",
 			Buttons = {
 				{ Text = "Delete", Primary = true, Callback = function()
 					cfg:DeleteProfile(sel)
@@ -1976,8 +1986,8 @@ local function buildConfigUI(tab, cfg, selectorComp, nameInput)
 
 	local function resetDefaults()
 		Nova.Dialog{
-			Title   = "Reset to Defaults",
-			Text    = "Restore all settings to their default values?",
+			Title = "Reset to Defaults",
+			Text = "Restore all settings to their default values?",
 			Buttons = {
 				{ Text = "Reset", Primary = true, Callback = function()
 					cfg:ResetDefaults()
@@ -2010,9 +2020,9 @@ function Container:MountConfig()
 			if loaded then
 				selectorComp:Set(loaded)
 				Nova.Notify{
-					Title    = "Config",
-					Text     = 'Auto-loaded "' .. loaded .. '" (' .. (toGame and "Game" or "Global") .. ')',
-					Type     = "info",
+					Title = "Config",
+					Text = 'Auto-loaded "' .. loaded .. '" (' .. (toGame and "Game" or "Global") .. ')',
+					Type = "info",
 					Duration = 2,
 				}
 			end
@@ -2028,13 +2038,13 @@ function Container:MountConfig()
 
 	local initProfiles = _cfgGame:_getIndex()
 	selectorComp = tab:AddDropdown{
-		Text    = "Active Profile",
+		Text = "Active Profile",
 		Options = initProfiles,
 		Default = initProfiles[1],
 	}
 
 	nameInput = tab:AddTextInput{
-		Text        = "Profile Name",
+		Text = "Profile Name",
 		Placeholder = "Enter name…",
 	}
 
@@ -2072,82 +2082,82 @@ local THEME_COLOR_KEYS = {
 
 local THEME_PRESETS = {
 	["Nova Dark"] = {
-		Background   = Color3.fromRGB(16, 16, 22),
-		Surface      = Color3.fromRGB(26, 26, 36),
+		Background = Color3.fromRGB(16, 16, 22),
+		Surface = Color3.fromRGB(26, 26, 36),
 		SurfaceHover = Color3.fromRGB(38, 38, 54),
-		Stroke       = Color3.fromRGB(52, 52, 72),
-		Accent       = Color3.fromRGB(124, 92, 255),
-		AccentAlt    = Color3.fromRGB(64, 170, 255),
-		Text         = Color3.fromRGB(240, 240, 250),
-		SubText      = Color3.fromRGB(145, 145, 170),
-		Success      = Color3.fromRGB(70, 210, 140),
-		Warning      = Color3.fromRGB(255, 190, 70),
-		Danger       = Color3.fromRGB(255, 90, 105),
+		Stroke = Color3.fromRGB(52, 52, 72),
+		Accent = Color3.fromRGB(124, 92, 255),
+		AccentAlt = Color3.fromRGB(64, 170, 255),
+		Text = Color3.fromRGB(240, 240, 250),
+		SubText = Color3.fromRGB(145, 145, 170),
+		Success = Color3.fromRGB(70, 210, 140),
+		Warning = Color3.fromRGB(255, 190, 70),
+		Danger = Color3.fromRGB(255, 90, 105),
 	},
 	["Midnight"] = {
-		Background   = Color3.fromRGB(8, 8, 14),
-		Surface      = Color3.fromRGB(14, 14, 24),
+		Background = Color3.fromRGB(8, 8, 14),
+		Surface = Color3.fromRGB(14, 14, 24),
 		SurfaceHover = Color3.fromRGB(22, 22, 38),
-		Stroke       = Color3.fromRGB(38, 38, 58),
-		Accent       = Color3.fromRGB(90, 60, 220),
-		AccentAlt    = Color3.fromRGB(40, 130, 220),
-		Text         = Color3.fromRGB(220, 220, 240),
-		SubText      = Color3.fromRGB(110, 110, 145),
-		Success      = Color3.fromRGB(50, 185, 120),
-		Warning      = Color3.fromRGB(220, 165, 50),
-		Danger       = Color3.fromRGB(220, 70, 85),
+		Stroke = Color3.fromRGB(38, 38, 58),
+		Accent = Color3.fromRGB(90, 60, 220),
+		AccentAlt = Color3.fromRGB(40, 130, 220),
+		Text = Color3.fromRGB(220, 220, 240),
+		SubText = Color3.fromRGB(110, 110, 145),
+		Success = Color3.fromRGB(50, 185, 120),
+		Warning = Color3.fromRGB(220, 165, 50),
+		Danger = Color3.fromRGB(220, 70, 85),
 	},
 	["Crimson"] = {
-		Background   = Color3.fromRGB(18, 10, 12),
-		Surface      = Color3.fromRGB(30, 16, 20),
+		Background = Color3.fromRGB(18, 10, 12),
+		Surface = Color3.fromRGB(30, 16, 20),
 		SurfaceHover = Color3.fromRGB(46, 24, 30),
-		Stroke       = Color3.fromRGB(70, 36, 44),
-		Accent       = Color3.fromRGB(220, 50, 80),
-		AccentAlt    = Color3.fromRGB(255, 120, 60),
-		Text         = Color3.fromRGB(245, 230, 232),
-		SubText      = Color3.fromRGB(170, 130, 140),
-		Success      = Color3.fromRGB(65, 200, 130),
-		Warning      = Color3.fromRGB(255, 185, 60),
-		Danger       = Color3.fromRGB(255, 60, 80),
+		Stroke = Color3.fromRGB(70, 36, 44),
+		Accent = Color3.fromRGB(220, 50, 80),
+		AccentAlt = Color3.fromRGB(255, 120, 60),
+		Text = Color3.fromRGB(245, 230, 232),
+		SubText = Color3.fromRGB(170, 130, 140),
+		Success = Color3.fromRGB(65, 200, 130),
+		Warning = Color3.fromRGB(255, 185, 60),
+		Danger = Color3.fromRGB(255, 60, 80),
 	},
 	["Ocean"] = {
-		Background   = Color3.fromRGB(8, 16, 26),
-		Surface      = Color3.fromRGB(14, 26, 42),
+		Background = Color3.fromRGB(8, 16, 26),
+		Surface = Color3.fromRGB(14, 26, 42),
 		SurfaceHover = Color3.fromRGB(20, 40, 62),
-		Stroke       = Color3.fromRGB(30, 58, 88),
-		Accent       = Color3.fromRGB(40, 180, 255),
-		AccentAlt    = Color3.fromRGB(60, 230, 200),
-		Text         = Color3.fromRGB(220, 240, 255),
-		SubText      = Color3.fromRGB(100, 150, 190),
-		Success      = Color3.fromRGB(60, 210, 150),
-		Warning      = Color3.fromRGB(255, 195, 60),
-		Danger       = Color3.fromRGB(255, 80, 100),
+		Stroke = Color3.fromRGB(30, 58, 88),
+		Accent = Color3.fromRGB(40, 180, 255),
+		AccentAlt = Color3.fromRGB(60, 230, 200),
+		Text = Color3.fromRGB(220, 240, 255),
+		SubText = Color3.fromRGB(100, 150, 190),
+		Success = Color3.fromRGB(60, 210, 150),
+		Warning = Color3.fromRGB(255, 195, 60),
+		Danger = Color3.fromRGB(255, 80, 100),
 	},
 	["Forest"] = {
-		Background   = Color3.fromRGB(10, 16, 12),
-		Surface      = Color3.fromRGB(16, 26, 18),
+		Background = Color3.fromRGB(10, 16, 12),
+		Surface = Color3.fromRGB(16, 26, 18),
 		SurfaceHover = Color3.fromRGB(24, 40, 26),
-		Stroke       = Color3.fromRGB(38, 60, 40),
-		Accent       = Color3.fromRGB(80, 200, 100),
-		AccentAlt    = Color3.fromRGB(160, 230, 80),
-		Text         = Color3.fromRGB(225, 245, 228),
-		SubText      = Color3.fromRGB(120, 160, 125),
-		Success      = Color3.fromRGB(60, 210, 120),
-		Warning      = Color3.fromRGB(220, 190, 60),
-		Danger       = Color3.fromRGB(220, 80, 80),
+		Stroke = Color3.fromRGB(38, 60, 40),
+		Accent = Color3.fromRGB(80, 200, 100),
+		AccentAlt = Color3.fromRGB(160, 230, 80),
+		Text = Color3.fromRGB(225, 245, 228),
+		SubText = Color3.fromRGB(120, 160, 125),
+		Success = Color3.fromRGB(60, 210, 120),
+		Warning = Color3.fromRGB(220, 190, 60),
+		Danger = Color3.fromRGB(220, 80, 80),
 	},
 	["Mono"] = {
-		Background   = Color3.fromRGB(12, 12, 12),
-		Surface      = Color3.fromRGB(22, 22, 22),
+		Background = Color3.fromRGB(12, 12, 12),
+		Surface = Color3.fromRGB(22, 22, 22),
 		SurfaceHover = Color3.fromRGB(34, 34, 34),
-		Stroke       = Color3.fromRGB(52, 52, 52),
-		Accent       = Color3.fromRGB(200, 200, 200),
-		AccentAlt    = Color3.fromRGB(160, 160, 160),
-		Text         = Color3.fromRGB(240, 240, 240),
-		SubText      = Color3.fromRGB(140, 140, 140),
-		Success      = Color3.fromRGB(160, 200, 160),
-		Warning      = Color3.fromRGB(200, 190, 140),
-		Danger       = Color3.fromRGB(200, 140, 140),
+		Stroke = Color3.fromRGB(52, 52, 52),
+		Accent = Color3.fromRGB(200, 200, 200),
+		AccentAlt = Color3.fromRGB(160, 160, 160),
+		Text = Color3.fromRGB(240, 240, 240),
+		SubText = Color3.fromRGB(140, 140, 140),
+		Success = Color3.fromRGB(160, 200, 160),
+		Warning = Color3.fromRGB(200, 190, 140),
+		Danger = Color3.fromRGB(200, 140, 140),
 	},
 }
 local PRESET_ORDER = { "Nova Dark","Midnight","Crimson","Ocean","Forest","Mono" }
@@ -2155,22 +2165,22 @@ local PRESET_ORDER = { "Nova Dark","Midnight","Crimson","Ocean","Forest","Mono" 
 local ThemeConfig = {}
 ThemeConfig.__index = ThemeConfig
 
-local TNS_GAME   = "NovaTheme_" .. tostring(game.PlaceId)
+local TNS_GAME = "NovaTheme_" .. tostring(game.PlaceId)
 local TNS_GLOBAL = "NovaTheme_Global"
 
 local function _newThemeConfig(namespace)
 	return setmetatable({
-		_namespace     = namespace,
-		_pickers       = {},
+		_namespace = namespace,
+		_pickers = {},
 		_activeProfile = nil,
 	}, ThemeConfig)
 end
 
-local _themeGame   = _newThemeConfig(TNS_GAME)
+local _themeGame = _newThemeConfig(TNS_GAME)
 local _themeGlobal = _newThemeConfig(TNS_GLOBAL)
-Nova._themeGame   = _themeGame
+Nova._themeGame = _themeGame
 Nova._themeGlobal = _themeGlobal
-Nova._theme       = _themeGame
+Nova._theme = _themeGame
 
 function ThemeConfig:_getIndex()
 	local raw = Storage.Load(self._namespace, "_index")
@@ -2214,12 +2224,17 @@ function ThemeConfig:_applyPalette(palette)
 	for _, key in THEME_COLOR_KEYS do
 		local c = palette[key]
 		if c and typeof(c) == "Color3" then
-			if self._pickers[key] then self._pickers[key]:Set(c) end
 			overrides[key] = c
+			Theme[key] = c
 		end
 	end
 	Nova.SetTheme(overrides)
-	for k, v in overrides do Theme[k] = v end
+	-- sync pickers if they exist (populated after MountTheme builds color section)
+	for key, c in overrides do
+		if self._pickers[key] then
+			pcall(function() self._pickers[key]:Set(c) end)
+		end
+	end
 end
 
 function ThemeConfig:SaveProfile(name)
@@ -2301,15 +2316,15 @@ end
 
 -- Fixed MountTheme: refreshThemeUI fires on initial mount
 function Container:MountTheme()
-	local tab    = self
+	local tab = self
 	local window = self.Window
 
 	if window then
 		tab:AddSection("Toggle Keybind")
 		tab:AddLabel("Set the key used to open / close this window.")
 		tab:AddKeybind{
-			Text     = "Toggle Key",
-			Default  = window._toggleKey or Enum.KeyCode.Unknown,
+			Text = "Toggle Key",
+			Default = window._toggleKey or Enum.KeyCode.Unknown,
 			Callback = function(key)
 				window._toggleKey = key
 				if window._toggleConn then
@@ -2326,10 +2341,10 @@ function Container:MountTheme()
 				end
 				Nova.Notify{
 					Title = "Keybind",
-					Text  = key == Enum.KeyCode.Unknown
+					Text = key == Enum.KeyCode.Unknown
 						and "Toggle keybind cleared."
 						or  'Toggle set to "'..key.Name..'"',
-					Type  = "info", Duration = 2,
+					Type = "info", Duration = 2,
 				}
 			end,
 		}
@@ -2342,7 +2357,7 @@ function Container:MountTheme()
 
 	local function refreshThemeUI(tc)
 		Nova._theme = tc
-		_themeGame._pickers   = tc._pickers
+		_themeGame._pickers = tc._pickers
 		_themeGlobal._pickers = tc._pickers
 		local idx = tc:_getIndex()
 		selectorComp:SetOptions(idx)
@@ -2368,7 +2383,7 @@ function Container:MountTheme()
 	for rowStart = 1, #PRESET_ORDER, presetsPerRow do
 		local rowBtns = {}
 		for i = rowStart, math.min(rowStart + presetsPerRow - 1, #PRESET_ORDER) do
-			local pname  = PRESET_ORDER[i]
+			local pname = PRESET_ORDER[i]
 			local accent = THEME_PRESETS[pname] and THEME_PRESETS[pname].Accent or Theme.Accent
 			table.insert(rowBtns, { pname, accent, function()
 				Nova._theme:ApplyPreset(pname)
@@ -2383,8 +2398,8 @@ function Container:MountTheme()
 	local pickers = {}
 	for _, key in THEME_COLOR_KEYS do
 		local picker = tab:AddColorPicker{
-			Text     = key,
-			Default  = Theme[key] or Color3.new(1,1,1),
+			Text = key,
+			Default = Theme[key] or Color3.new(1,1,1),
 			Callback = function(c)
 				Nova.SetTheme({ [key] = c })
 				Theme[key] = c
@@ -2392,20 +2407,20 @@ function Container:MountTheme()
 		}
 		pickers[key] = picker
 	end
-	_themeGame._pickers   = pickers
+	_themeGame._pickers = pickers
 	_themeGlobal._pickers = pickers
 
 	tab:AddSection("Saved Themes")
 
 	local initIdx = _themeGame:_getIndex()
 	selectorComp = tab:AddDropdown{
-		Text    = "Active Theme",
+		Text = "Active Theme",
 		Options = initIdx,
 		Default = initIdx[1],
 	}
 
 	nameInput = tab:AddTextInput{
-		Text        = "Theme Name",
+		Text = "Theme Name",
 		Placeholder = "Enter name…",
 	}
 
@@ -2418,8 +2433,8 @@ function Container:MountTheme()
 				return
 			end
 			Nova.Dialog{
-				Title   = 'Overwrite "'..tostring(sel)..'"?',
-				Text    = "This will replace its saved colors.",
+				Title = 'Overwrite "'..tostring(sel)..'"?',
+				Text = "This will replace its saved colors.",
 				Buttons = {
 					{ Text = "Overwrite", Primary = true, Callback = function()
 						if Nova._theme:SaveProfile(sel) then
@@ -2438,8 +2453,8 @@ function Container:MountTheme()
 			end
 			if Nova._theme:_profileExists(name) then
 				Nova.Dialog{
-					Title   = 'Theme "'..name..'" exists',
-					Text    = "Overwrite it?",
+					Title = 'Theme "'..name..'" exists',
+					Text = "Overwrite it?",
 					Buttons = {
 						{ Text = "Overwrite", Primary = true, Callback = function()
 							if Nova._theme:SaveProfile(name) then
@@ -2482,8 +2497,8 @@ function Container:MountTheme()
 				return
 			end
 			Nova.Dialog{
-				Title   = 'Delete "'..tostring(sel)..'"?',
-				Text    = "This cannot be undone.",
+				Title = 'Delete "'..tostring(sel)..'"?',
+				Text = "This cannot be undone.",
 				Buttons = {
 					{ Text = "Delete", Primary = true, Callback = function()
 						Nova._theme:DeleteProfile(sel)
@@ -2606,17 +2621,17 @@ function Window:AddTab(name, icon)
 	local idx = #self.Tabs + 1
 	local fullText = (icon and (icon .. "  ") or "") .. name
 	local btn = create("TextButton", {
-		Name             = name,
-		Size             = UDim2.new(1, 0, 0, 36),
-		LayoutOrder      = idx,
+		Name = name,
+		Size = UDim2.new(1, 0, 0, 36),
+		LayoutOrder = idx,
 		BackgroundColor3 = Theme.SurfaceHover,
 		BackgroundTransparency = 1,
-		Text             = fullText,
-		TextColor3       = Theme.SubText,
-		TextXAlignment   = Enum.TextXAlignment.Left,
-		TextTruncate     = Enum.TextTruncate.AtEnd,
+		Text = fullText,
+		TextColor3 = Theme.SubText,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
 		ClipsDescendants = true,
-		Parent           = self.TabList,
+		Parent = self.TabList,
 	}, { corner(8), padding(14, 0, 8, 0) })
 	btn.MouseEnter:Connect(function()
 		local textW = game:GetService("TextService"):GetTextSize(
@@ -2629,20 +2644,20 @@ function Window:AddTab(name, icon)
 	btn.MouseLeave:Connect(hideTooltip)
 
 	local page = create("CanvasGroup", {
-		Name             = name,
-		Size             = UDim2.fromScale(1, 1),
+		Name = name,
+		Size = UDim2.fromScale(1, 1),
 		GroupTransparency= 1,
-		Visible          = false,
-		Parent           = self.Content,
+		Visible = false,
+		Parent = self.Content,
 	})
 	local scroll = create("ScrollingFrame", {
-		Size                  = UDim2.fromScale(1, 1),
-		CanvasSize            = UDim2.new(),
-		AutomaticCanvasSize   = Enum.AutomaticSize.Y,
-		ScrollBarThickness    = 3,
-		ScrollBarImageColor3  = Theme.Accent,
-		ScrollingDirection    = Enum.ScrollingDirection.Y,
-		Parent                = page,
+		Size = UDim2.fromScale(1, 1),
+		CanvasSize = UDim2.new(),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		ScrollBarThickness = 3,
+		ScrollBarImageColor3 = Theme.Accent,
+		ScrollingDirection = Enum.ScrollingDirection.Y,
+		Parent = page,
 	}, {
 		create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }),
 		padding(12, 12, 16, 12),
@@ -2685,12 +2700,12 @@ function Nova.Window(o)
 	self.Gui = o.Gui or Nova.ScreenGui(o.Name or "NovaWindow")
 
 	local root = create("Frame", {
-		Name        = "Window",
+		Name = "Window",
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position    = UDim2.fromScale(0.5, 0.5),
-		Size        = UDim2.fromOffset(size.X, size.Y),
-		Visible     = false,
-		Parent      = self.Gui,
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromOffset(size.X, size.Y),
+		Visible = false,
+		Parent = self.Gui,
 	})
 	local fit = create("UIScale", { Parent = root })
 	self.Root = root
@@ -2708,12 +2723,12 @@ function Nova.Window(o)
 	end
 
 	local main = create("CanvasGroup", {
-		Name             = "Main",
-		Size             = UDim2.fromScale(1, 1),
-		Position         = UDim2.fromOffset(0, 24),
+		Name = "Main",
+		Size = UDim2.fromScale(1, 1),
+		Position = UDim2.fromOffset(0, 24),
 		BackgroundColor3 = Theme.Background,
 		GroupTransparency= 1,
-		Parent           = root,
+		Parent = root,
 	}, { corner(14) })
 	self.Main = main
 	self.OpenScale = create("UIScale", { Scale = 0.88, Parent = main })
@@ -2733,41 +2748,41 @@ function Nova.Window(o)
 	end)
 
 	local top = create("Frame", {
-		Name             = "TopBar",
-		Size             = UDim2.new(1, 0, 0, 46),
+		Name = "TopBar",
+		Size = UDim2.new(1, 0, 0, 46),
 		BackgroundColor3 = Theme.Surface,
-		Parent           = main,
+		Parent = main,
 	})
 	create("Frame", {
-		AnchorPoint      = Vector2.new(0, 1),
-		Position         = UDim2.fromScale(0, 1),
-		Size             = UDim2.new(1, 0, 0, 1),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		Size = UDim2.new(1, 0, 0, 1),
 		BackgroundColor3 = Theme.Stroke,
-		Parent           = top,
+		Parent = top,
 	})
 	self.TitleLabel = create("TextLabel", {
-		Position       = UDim2.fromOffset(16, 0),
-		Size           = UDim2.new(1, -110, 1, 0),
-		Font           = Theme.FontBold,
-		TextSize       = 16,
-		RichText       = true,
+		Position = UDim2.fromOffset(16, 0),
+		Size = UDim2.new(1, -110, 1, 0),
+		Font = Theme.FontBold,
+		TextSize = 16,
+		RichText = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Parent         = top,
+		Parent = top,
 	})
 	self:SetTitle(o.Title or "Nova UI", o.Subtitle)
 
 	local function ctrl(text, xOff, hoverColor, cb)
 		local b = create("TextButton", {
-			AnchorPoint      = Vector2.new(1, 0.5),
-			Position         = UDim2.new(1, xOff, 0.5, 0),
-			Size             = UDim2.fromOffset(28, 28),
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.new(1, xOff, 0.5, 0),
+			Size = UDim2.fromOffset(28, 28),
 			BackgroundColor3 = Theme.SurfaceHover,
 			BackgroundTransparency = 1,
-			Text             = text,
-			Font             = Theme.FontBold,
-			TextSize         = 16,
-			TextColor3       = Theme.SubText,
-			Parent           = top,
+			Text = text,
+			Font = Theme.FontBold,
+			TextSize = 16,
+			TextColor3 = Theme.SubText,
+			Parent = top,
 		}, { corner(8) })
 		local s = create("UIScale", { Parent = b })
 		b.MouseEnter:Connect(function()
@@ -2787,93 +2802,93 @@ function Nova.Window(o)
 	ctrl("–", -46, Theme.Warning,  function() self:Minimize() end)
 
 	local sidebar = create("Frame", {
-		Name     = "Sidebar",
+		Name = "Sidebar",
 		Position = UDim2.fromOffset(0, 46),
-		Size     = UDim2.new(0, 150, 1, -46),
-		Parent   = main,
+		Size = UDim2.new(0, 150, 1, -46),
+		Parent = main,
 	})
 	create("Frame", {
-		AnchorPoint      = Vector2.new(1, 0),
-		Position         = UDim2.fromScale(1, 0),
-		Size             = UDim2.new(0, 1, 1, 0),
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.fromScale(1, 0),
+		Size = UDim2.new(0, 1, 1, 0),
 		BackgroundColor3 = Theme.Stroke,
-		Parent           = sidebar,
+		Parent = sidebar,
 	})
 	self.TabList = create("Frame", { Size = UDim2.fromScale(1, 1), Parent = sidebar }, {
 		create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }),
 		padding(8, 10, 8, 8),
 	})
 	self.Indicator = create("Frame", {
-		Position         = UDim2.fromOffset(2, 18),
-		Size             = UDim2.fromOffset(3, 20),
+		Position = UDim2.fromOffset(2, 18),
+		Size = UDim2.fromOffset(3, 20),
 		BackgroundColor3 = Theme.Accent,
-		ZIndex           = 3,
-		Parent           = sidebar,
+		ZIndex = 3,
+		Parent = sidebar,
 	}, { pill() })
 	self.Sidebar = sidebar
 
 	self.Content = create("Frame", {
-		Name     = "Content",
+		Name = "Content",
 		Position = UDim2.fromOffset(150, 46),
-		Size     = UDim2.new(1, -150, 1, -46),
-		Parent   = main,
+		Size = UDim2.new(1, -150, 1, -46),
+		Parent = main,
 	})
 
 	local PROFILE_H = 68
 	local profileCard = create("Frame", {
-		Name             = "ProfileCard",
-		AnchorPoint      = Vector2.new(0, 1),
-		Position         = UDim2.new(0, 0, 1, 0),
-		Size             = UDim2.new(1, 0, 0, PROFILE_H),
+		Name = "ProfileCard",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 0, 1, 0),
+		Size = UDim2.new(1, 0, 0, PROFILE_H),
 		BackgroundColor3 = Theme.Background,
-		ZIndex           = 2,
-		Parent           = sidebar,
+		ZIndex = 2,
+		Parent = sidebar,
 	})
 	create("Frame", {
-		Size             = UDim2.new(1, 0, 0, 1),
+		Size = UDim2.new(1, 0, 0, 1),
 		BackgroundColor3 = Theme.Stroke,
-		ZIndex           = 3,
-		Parent           = profileCard,
+		ZIndex = 3,
+		Parent = profileCard,
 	})
 
 	local avatarImg = create("ImageLabel", {
-		AnchorPoint      = Vector2.new(0, 0.5),
-		Position         = UDim2.new(0, 10, 0.5, -6),
-		Size             = UDim2.fromOffset(34, 34),
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 10, 0.5, -6),
+		Size = UDim2.fromOffset(34, 34),
 		BackgroundColor3 = Theme.Surface,
-		ZIndex           = 3,
-		Parent           = profileCard,
+		ZIndex = 3,
+		Parent = profileCard,
 	}, { pill(), stroke(Theme.Stroke, 1, 0.3) })
 
 	local displayNameLabel = create("TextLabel", {
-		Position         = UDim2.new(0, 50, 0, 8),
-		Size             = UDim2.new(1, -54, 0, 18),
-		Text             = "…",
-		Font             = Theme.FontBold,
-		TextSize         = 12,
-		TextColor3       = Theme.Text,
-		TextXAlignment   = Enum.TextXAlignment.Left,
-		TextTruncate     = Enum.TextTruncate.AtEnd,
-		ZIndex           = 3,
-		Parent           = profileCard,
+		Position = UDim2.new(0, 50, 0, 8),
+		Size = UDim2.new(1, -54, 0, 18),
+		Text = "…",
+		Font = Theme.FontBold,
+		TextSize = 12,
+		TextColor3 = Theme.Text,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		ZIndex = 3,
+		Parent = profileCard,
 	})
 
 	local statusLabel = create("TextLabel", {
-		Position         = UDim2.new(0, 50, 0, 28),
-		Size             = UDim2.new(1, -54, 0, 14),
-		Text             = o.StatusText or "NovaUI " .. Nova.Version,
-		Font             = Theme.Font,
-		TextSize         = 11,
-		TextColor3       = Theme.SubText,
-		TextXAlignment   = Enum.TextXAlignment.Left,
-		TextTruncate     = Enum.TextTruncate.AtEnd,
-		ZIndex           = 3,
-		Parent           = profileCard,
+		Position = UDim2.new(0, 50, 0, 28),
+		Size = UDim2.new(1, -54, 0, 14),
+		Text = o.StatusText or "NovaUI " .. Nova.Version,
+		Font = Theme.Font,
+		TextSize = 11,
+		TextColor3 = Theme.SubText,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		ZIndex = 3,
+		Parent = profileCard,
 	})
 	self._statusLabel = statusLabel
 
 	local profileHit = create("TextButton", {
-		Size   = UDim2.fromScale(1, 1),
+		Size = UDim2.fromScale(1, 1),
 		ZIndex = 4,
 		Parent = profileCard,
 	})
@@ -2918,12 +2933,12 @@ function Nova.Window(o)
 	end)
 
 	if o.ToggleKey then
-		self._toggleKey  = o.ToggleKey
+		self._toggleKey = o.ToggleKey
 		self._toggleConn = self:_connect(UserInputService.InputBegan, function(input, processed)
 			if not processed and input.KeyCode == self._toggleKey then self:Toggle() end
 		end)
 	else
-		self._toggleKey  = Enum.KeyCode.Unknown
+		self._toggleKey = Enum.KeyCode.Unknown
 		self._toggleConn = nil
 	end
 
@@ -2945,13 +2960,13 @@ local function getHolder()
 	local gui = Nova.ScreenGui("NovaNotifications", 1000)
 	holder = create("Frame", {
 		AnchorPoint = Vector2.new(1, 1),
-		Position    = UDim2.new(1, -14, 1, -14),
-		Size        = UDim2.new(0, 320, 1, -28),
-		Parent      = gui,
+		Position = UDim2.new(1, -14, 1, -14),
+		Size = UDim2.new(0, 320, 1, -28),
+		Parent = gui,
 	}, {
 		create("UIListLayout", {
-			Padding           = UDim.new(0, 8),
-			SortOrder         = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 8),
+			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Bottom,
 		}),
 	})
@@ -2960,19 +2975,19 @@ end
 
 function Nova.Notify(o)
 	o = o or {}
-	local kinds    = { info = Theme.Accent, success = Theme.Success, warning = Theme.Warning, error = Theme.Danger }
-	local color    = kinds[o.Type or "info"] or Theme.Accent
+	local kinds = { info = Theme.Accent, success = Theme.Success, warning = Theme.Warning, error = Theme.Danger }
+	local color = kinds[o.Type or "info"] or Theme.Accent
 	local duration = o.Duration or 4
 	local H = 72
 	toastId += 1
 
 	local wrap = create("Frame", { Size = UDim2.new(1, 0, 0, 0), LayoutOrder = toastId, Parent = getHolder() })
 	local card = create("CanvasGroup", {
-		Size             = UDim2.new(1, 0, 0, H),
-		Position         = UDim2.fromOffset(340, 0),
+		Size = UDim2.new(1, 0, 0, H),
+		Position = UDim2.fromOffset(340, 0),
 		BackgroundColor3 = Theme.Surface,
 		GroupTransparency= 1,
-		Parent           = wrap,
+		Parent = wrap,
 	}, { corner(10), stroke(Theme.Stroke, 1, 0.2) })
 
 	create("Frame", { Size = UDim2.new(0, 4, 1, 0), BackgroundColor3 = color, Parent = card })
@@ -2989,11 +3004,11 @@ function Nova.Notify(o)
 		Parent = card,
 	})
 	local bar = create("Frame", {
-		AnchorPoint      = Vector2.new(0, 1),
-		Position         = UDim2.fromScale(0, 1),
-		Size             = UDim2.new(1, 0, 0, 2),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		Size = UDim2.new(1, 0, 0, 2),
 		BackgroundColor3 = color,
-		Parent           = card,
+		Parent = card,
 	})
 	local hit = create("TextButton", { Size = UDim2.fromScale(1, 1), ZIndex = 5, Parent = card })
 
@@ -3029,19 +3044,19 @@ function Nova.Dialog(o)
 	local gui = Nova.ScreenGui("NovaDialog", 900)
 
 	local dim = create("TextButton", {
-		Size             = UDim2.fromScale(1, 1),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.new(0, 0, 0),
 		BackgroundTransparency = 1,
-		Parent           = gui,
+		Parent = gui,
 	})
 	local card = create("CanvasGroup", {
-		AnchorPoint      = Vector2.new(0.5, 0.5),
-		Position         = UDim2.fromScale(0.5, 0.5),
-		Size             = UDim2.fromOffset(340, 0),
-		AutomaticSize    = Enum.AutomaticSize.Y,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromOffset(340, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Theme.Surface,
 		GroupTransparency= 1,
-		Parent           = gui,
+		Parent = gui,
 	}, {
 		corner(14),
 		stroke(Theme.Stroke, 1, 0.2),
@@ -3063,10 +3078,10 @@ function Nova.Dialog(o)
 	})
 	local row = create("Frame", { LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 38), Parent = card }, {
 		create("UIListLayout", {
-			FillDirection        = Enum.FillDirection.Horizontal,
-			HorizontalAlignment  = Enum.HorizontalAlignment.Right,
-			VerticalAlignment    = Enum.VerticalAlignment.Center,
-			Padding              = UDim.new(0, 8),
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, 8),
 		}),
 	})
 
@@ -3081,15 +3096,15 @@ function Nova.Dialog(o)
 	end
 
 	for i, b in o.Buttons or { { Text = "OK", Primary = true } } do
-		local base  = b.Primary and Theme.Accent or Theme.SurfaceHover
+		local base = b.Primary and Theme.Accent or Theme.SurfaceHover
 		local hover = b.Primary and Theme.AccentAlt or Theme.Stroke
-		local btn   = create("TextButton", {
-			LayoutOrder      = i,
-			Size             = UDim2.fromOffset(96, 34),
+		local btn = create("TextButton", {
+			LayoutOrder = i,
+			Size = UDim2.fromOffset(96, 34),
 			BackgroundColor3 = base,
-			Text             = b.Text or "OK",
-			Font             = Theme.FontBold,
-			Parent           = row,
+			Text = b.Text or "OK",
+			Font = Theme.FontBold,
+			Parent = row,
 		}, { corner(8) })
 		local s = create("UIScale", { Parent = btn })
 		hoverable(btn, btn, s, base, hover, 1.05)

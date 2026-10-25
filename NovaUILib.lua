@@ -308,7 +308,7 @@ local function ripple(face, input)
 		SizeConstraint = Enum.SizeConstraint.RelativeXX,
 		BackgroundColor3    = Color3.new(1, 1, 1),
 		BackgroundTransparency = 0.72,
-		ZIndex      = 4,   -- above label (ZIndex 3) but below hit (ZIndex 5)
+		ZIndex      = 4,
 		Parent      = face,
 	}, { pill() })
 	A(r, "Size", UDim2.fromScale(2.6, 2.6), { 12, 1 })
@@ -316,7 +316,6 @@ local function ripple(face, input)
 	task.delay(0.8, function() r:Destroy() end)
 end
 
--- Colour helpers
 local function hsvToRgb(h, s, v)
 	if s == 0 then return Color3.new(v, v, v) end
 	h = h * 6
@@ -370,20 +369,14 @@ end
 
 local function keyName(key)
 	if key == Enum.KeyCode.Unknown then return "None" end
-	local n = key.Name
-	-- strip leading "Left"/"Right" prefix for display neatness
-	return n
+	return key.Name
 end
 
 --------------------------------------------------------------------------------
--- ScreenGui factory
+-- Tooltip helper
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
--- Tooltip helper (reused for tab labels and player card)
---------------------------------------------------------------------------------
-
-local tooltipGui   -- lazily created ScreenGui
+local tooltipGui
 local tooltipFrame
 local tooltipLabel
 
@@ -431,8 +424,6 @@ local function hideTooltip()
 	if tooltipConn  then tooltipConn:Disconnect(); tooltipConn = nil end
 end
 
--- Wire a GuiObject to show a tooltip on hover.
--- truncateLabel: optional TextLabel to set TextTruncate + ElideText behaviour
 local function withTooltip(hoverObject, text)
 	hoverObject.MouseEnter:Connect(function() showTooltip(text) end)
 	hoverObject.MouseLeave:Connect(hideTooltip)
@@ -443,7 +434,6 @@ end
 --------------------------------------------------------------------------------
 
 function Nova.ScreenGui(name, displayOrder)
-	-- Parent priority: gethui() → CoreGui → PlayerGui
 	local parent
 	if type(gethui) == "function" then
 		local ok, h = pcall(gethui)
@@ -472,7 +462,7 @@ function Nova.ScreenGui(name, displayOrder)
 end
 
 --------------------------------------------------------------------------------
--- Container (a tab page). Holds all the Add* component methods.
+-- Container
 --------------------------------------------------------------------------------
 
 local Container = {}
@@ -545,11 +535,6 @@ function Container:AddLabel(text)
 	}
 end
 
--- ── Button ──────────────────────────────────────────────────────────────────
--- Fix: label lives inside `face` (CanvasGroup) at ZIndex 3.
--- Ripple is now spawned at ZIndex 4, so it draws OVER the label briefly,
--- which looks correct. The transparent hit button is at ZIndex 5 on `card`
--- (parent of face), so it captures input but never obscures anything inside face.
 function Container:AddButton(o)
 	o = o or {}
 	local card, scale = self:_card(40, true)
@@ -558,11 +543,10 @@ function Container:AddButton(o)
 		Color    = ColorSequence.new(Theme.Accent, Theme.AccentAlt),
 		Rotation = 20,
 	})
-	-- face is a CanvasGroup so ripple clips to rounded corners
 	local face = create("Frame", {
-    	Size             = UDim2.fromScale(1, 1),
-    	BackgroundColor3 = Color3.new(1, 1, 1),
-    	Parent           = card,
+		Size             = UDim2.fromScale(1, 1),
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		Parent           = card,
 	}, { corner(8), grad })
 
 	local label = create("TextLabel", {
@@ -575,12 +559,10 @@ function Container:AddButton(o)
 		Parent         = face,
 	})
 
-	-- hit sits on card (same level as face) so it captures the full card area
-	-- ZIndex 5 puts it above face's children visually but input still routes through
 	local hit = create("TextButton", {
-    	Size   = UDim2.fromScale(1, 1),
-    	ZIndex = 5,
-    	Parent = face,  -- ← inside face, not card
+		Size   = UDim2.fromScale(1, 1),
+		ZIndex = 5,
+		Parent = face,
 	})
 
 	hit.MouseEnter:Connect(function()
@@ -606,7 +588,6 @@ function Container:AddButton(o)
 	}
 end
 
--- ── Toggle ───────────────────────────────────────────────────────────────────
 function Container:AddToggle(o)
 	o = o or {}
 	local card, scale = self:_card(44)
@@ -667,7 +648,6 @@ function Container:AddToggle(o)
 	}
 end
 
--- ── Slider ───────────────────────────────────────────────────────────────────
 function Container:AddSlider(o)
 	o = o or {}
 	local min, max, inc = o.Min or 0, o.Max or 100, o.Increment or 1
@@ -753,8 +733,6 @@ function Container:AddSlider(o)
 	}
 end
 
--- ── TextInput ─────────────────────────────────────────────────────────────────
--- Set() now fires Callback with enter = true (same as pressing Enter)
 function Container:AddTextInput(o)
 	o = o or {}
 	local card, scale = self:_card(44)
@@ -797,7 +775,6 @@ function Container:AddTextInput(o)
 	return {
 		Frame = card,
 		Get   = function() return box.Text end,
-		-- Set now fires Callback with enter = true (programmatic = confirmed)
 		Set   = function(_, t)
 			box.Text = t
 			if o.Callback then task.spawn(o.Callback, t, true) end
@@ -805,10 +782,6 @@ function Container:AddTextInput(o)
 	}
 end
 
--- ── Dropdown (single-select, live-update) ────────────────────────────────────
--- New API: dd:AddOption(opt), dd:RemoveOption(opt)
--- SetOptions still works and replaces the whole list.
--- If the options table changes while the dropdown is open the list resizes live.
 function Container:AddDropdown(o)
 	o = o or {}
 	local options  = {}
@@ -873,7 +846,6 @@ function Container:AddDropdown(o)
 		if fire and o.Callback then task.spawn(o.Callback, opt) end
 	end
 
-	-- rebuild ALL option buttons from scratch
 	local function rebuild()
 		for _, b in buttons do b:Destroy() end
 		table.clear(buttons)
@@ -904,7 +876,6 @@ function Container:AddDropdown(o)
 	cardHover(card, hit, scale)
 	hit.Activated:Connect(function() setOpen(not open) end)
 
-	-- ── helpers for live mutation ────────────────────────────────────────────
 	local function addOptionButton(opt, idx)
 		local b = create("TextButton", {
 			Name               = tostring(opt),
@@ -928,7 +899,7 @@ function Container:AddDropdown(o)
 
 	local function updateListSize()
 		list.Size = UDim2.new(1, -16, 0, listHeight())
-		if open then setOpen(true) end   -- re-animate card height
+		if open then setOpen(true) end
 	end
 
 	return {
@@ -936,7 +907,6 @@ function Container:AddDropdown(o)
 		Get   = function() return selected end,
 		Set   = function(_, v) choose(v, true) end,
 
-		-- Replace all options
 		SetOptions = function(_, newOptions)
 			options = {}
 			for _, v in newOptions do table.insert(options, v) end
@@ -944,22 +914,19 @@ function Container:AddDropdown(o)
 			if open then setOpen(true) end
 		end,
 
-		-- Add a single option without closing
 		AddOption = function(_, opt)
 			for _, v in options do
-				if v == opt then return end  -- already present
+				if v == opt then return end
 			end
 			table.insert(options, opt)
 			addOptionButton(opt, #options)
 			updateListSize()
 		end,
 
-		-- Remove a single option; deselects if it was selected
 		RemoveOption = function(_, opt)
 			for i, v in options do
 				if v == opt then
 					table.remove(options, i)
-					-- destroy matching button
 					for j, b in buttons do
 						if b.Name == tostring(opt) then
 							b:Destroy()
@@ -971,7 +938,6 @@ function Container:AddDropdown(o)
 						selected = nil
 						valueLabel.Text = "Select…"
 					end
-					-- re-index LayoutOrder
 					for idx, b in buttons do b.LayoutOrder = idx end
 					updateListSize()
 					return
@@ -981,18 +947,13 @@ function Container:AddDropdown(o)
 	}
 end
 
--- ── MultiDropdown ─────────────────────────────────────────────────────────────
--- tab:AddMultiDropdown{ Text, Options, Default = {}, Max, Callback }
--- Callback receives the current selected-set as a table of values.
--- API: :Get() → table, :Set({...}) replace selection, :AddOption, :RemoveOption, :SetOptions
 function Container:AddMultiDropdown(o)
 	o = o or {}
 	local options  = {}
 	for _, v in (o.Options or {}) do table.insert(options, v) end
-	local maxSel   = o.Max  -- nil = unlimited
+	local maxSel   = o.Max
 
-	-- seed from Default
-	local selected = {}  -- { [value] = true }
+	local selected = {}
 	for _, v in (o.Default or {}) do selected[v] = true end
 
 	local HEAD, OPT = 44, 30
@@ -1061,20 +1022,6 @@ function Container:AddMultiDropdown(o)
 		A(chevron, "TextColor3", v and Theme.Accent or Theme.SubText,  P.Snappy)
 	end
 
-	local function refreshChecks()
-		for _, b in buttons do
-			local chk = b:FindFirstChild("_check")
-			if chk then
-				local on = selected[b:FindFirstChild("_value") and b._value or nil]
-				-- we store value in an attribute instead
-				local bval = b:GetAttribute("_val")
-				local isOn = selected[bval] == true
-				A(chk,  "BackgroundColor3", isOn and Theme.Accent or Theme.Stroke, P.Snappy)
-				A(b,    "TextColor3",       isOn and Theme.Accent or Theme.Text,   P.Snappy)
-			end
-		end
-	end
-
 	local function rebuild()
 		for _, b in buttons do b:Destroy() end
 		table.clear(buttons)
@@ -1093,8 +1040,7 @@ function Container:AddMultiDropdown(o)
 				TextXAlignment     = Enum.TextXAlignment.Left,
 				Parent             = list,
 			}, { corner(6), padding(34, 0, 0, 0) })
-			b:SetAttribute("_val", tostring(opt))  -- store as string key
-			-- checkmark box
+			b:SetAttribute("_val", tostring(opt))
 			local chk = create("Frame", {
 				Name             = "_check",
 				AnchorPoint      = Vector2.new(0, 0.5),
@@ -1103,7 +1049,6 @@ function Container:AddMultiDropdown(o)
 				BackgroundColor3 = isOn and Theme.Accent or Theme.Stroke,
 				Parent           = b,
 			}, { corner(4) })
-			-- tick mark
 			local tick = create("TextLabel", {
 				Size       = UDim2.fromScale(1, 1),
 				Text       = "✓",
@@ -1118,14 +1063,12 @@ function Container:AddMultiDropdown(o)
 			b.MouseEnter:Connect(function()  A(b, "BackgroundTransparency", 0, P.Snappy) end)
 			b.MouseLeave:Connect(function()  A(b, "BackgroundTransparency", 1, P.Snappy) end)
 			b.Activated:Connect(function()
-				local key = tostring(opt)
 				if selected[opt] then
 					selected[opt] = nil
 					A(chk,  "BackgroundColor3", Theme.Stroke, P.Snappy)
 					A(b,    "TextColor3",       Theme.Text,   P.Snappy)
 					tick.Visible = false
 				else
-					-- check max
 					if maxSel then
 						local count = 0
 						for _ in selected do count += 1 end
@@ -1170,7 +1113,6 @@ function Container:AddMultiDropdown(o)
 		SetOptions = function(_, newOptions)
 			options = {}
 			for _, v in newOptions do table.insert(options, v) end
-			-- prune selection to only valid options
 			local validSet = {}
 			for _, v in options do validSet[v] = true end
 			for k in selected do if not validSet[k] then selected[k] = nil end end
@@ -1197,20 +1139,16 @@ function Container:AddMultiDropdown(o)
 	}
 end
 
--- ── ColorPicker ───────────────────────────────────────────────────────────────
--- tab:AddColorPicker{ Text, Default = Color3, Callback }
--- Collapsed: shows a color swatch. Expanded: SV square + H strip + hex input.
 function Container:AddColorPicker(o)
 	o = o or {}
 	local HEAD      = 44
-	local EXPANDED  = 44 + 160 + 8  -- header + picker body + padding
+	local EXPANDED  = 44 + 160 + 8
 	local card, scale = self:_card(HEAD)
 	card.ClipsDescendants = true
 
 	local color   = o.Default or Color3.fromRGB(124, 92, 255)
 	local h, s, v = rgbToHsv(color)
 
-	-- ── header ──────────────────────────────────────────────────────────────
 	create("TextLabel", {
 		Position = UDim2.fromOffset(14, 0), Size = UDim2.new(1, -80, 0, HEAD),
 		Text = o.Text or "Color", TextXAlignment = Enum.TextXAlignment.Left,
@@ -1230,7 +1168,6 @@ function Container:AddColorPicker(o)
 	})
 	local hit = create("TextButton", { Size = UDim2.new(1, 0, 0, HEAD), ZIndex = 5, Parent = card })
 
-	-- ── picker body ──────────────────────────────────────────────────────────
 	local body = create("Frame", {
 		Position = UDim2.new(0, 8, 0, HEAD + 4),
 		Size     = UDim2.new(1, -16, 0, 152),
@@ -1238,14 +1175,12 @@ function Container:AddColorPicker(o)
 		Parent   = card,
 	})
 
-	-- SV square (128×128)
 	local sqSize = 128
 	local sq = create("Frame", {
 		Size             = UDim2.fromOffset(sqSize, sqSize),
-		BackgroundColor3 = Color3.new(1, 0, 0),  -- tinted by h
+		BackgroundColor3 = Color3.new(1, 0, 0),
 		Parent           = body,
 	}, { corner(6) })
-	-- white-to-transparent gradient (left→right = sat 0→1, actually we overlay two gradients)
 	local sqWhite = create("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.new(1, 1, 1),
@@ -1253,10 +1188,9 @@ function Container:AddColorPicker(o)
 	}, { corner(6), create("UIGradient", {
 		Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.new(1,1,1)),
-			ColorSequenceKeypoint.new(1, Color3.new(1,1,1,0)),  -- transparent white
+			ColorSequenceKeypoint.new(1, Color3.new(1,1,1,0)),
 		}),
 	}) })
-	-- black gradient top→bottom
 	local sqBlack = create("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.new(0, 0, 0),
@@ -1268,7 +1202,6 @@ function Container:AddColorPicker(o)
 			ColorSequenceKeypoint.new(1, Color3.new(0,0,0)),
 		}),
 	}) })
-	-- SV cursor
 	local svCursor = create("Frame", {
 		AnchorPoint      = Vector2.new(0.5, 0.5),
 		Size             = UDim2.fromOffset(12, 12),
@@ -1277,13 +1210,11 @@ function Container:AddColorPicker(o)
 		Parent           = sq,
 	}, { pill(), stroke(Color3.new(0,0,0), 1, 0) })
 
-	-- Hue strip (right of square, 12px wide)
 	local hStrip = create("Frame", {
 		Position = UDim2.fromOffset(sqSize + 8, 0),
 		Size     = UDim2.fromOffset(12, sqSize),
 		Parent   = body,
 	}, { corner(6) })
-	-- rainbow gradient
 	local hGrad = create("UIGradient", {
 		Rotation = 90,
 		Color = ColorSequence.new({
@@ -1297,8 +1228,7 @@ function Container:AddColorPicker(o)
 		}),
 		Parent = hStrip,
 	})
-	hStrip.BackgroundColor3 = Color3.new(1,1,1)  -- gets coloured by gradient
-	-- hue cursor bar
+	hStrip.BackgroundColor3 = Color3.new(1,1,1)
 	local hCursor = create("Frame", {
 		AnchorPoint      = Vector2.new(0.5, 0.5),
 		Size             = UDim2.new(1, 4, 0, 4),
@@ -1307,7 +1237,6 @@ function Container:AddColorPicker(o)
 		Parent           = hStrip,
 	}, { pill(), stroke(Color3.new(0,0,0), 1, 0) })
 
-	-- Hex input
 	local hexBox = create("TextBox", {
 		Position         = UDim2.new(0, 0, 0, sqSize + 8),
 		Size             = UDim2.new(1, 0, 0, 26),
@@ -1320,12 +1249,10 @@ function Container:AddColorPicker(o)
 		Parent           = body,
 	}, { corner(6), padding(8, 0, 8, 0), stroke(Theme.Stroke, 1, 0) })
 
-	-- ── update functions ─────────────────────────────────────────────────────
 	local function applyColor(fireCallback)
 		color = hsvToRgb(h, s, v)
 		swatch.BackgroundColor3 = color
 		sq.BackgroundColor3     = Color3.fromHSV(h, 1, 1)
-		-- cursor positions
 		svCursor.Position = UDim2.fromScale(s, 1 - v)
 		hCursor.Position  = UDim2.new(0.5, 0, h, 0)
 		hexBox.Text       = colorToHex(color)
@@ -1333,7 +1260,6 @@ function Container:AddColorPicker(o)
 	end
 	applyColor(false)
 
-	-- SV drag
 	local sqDragging = false
 	local sqHit = create("TextButton", { Size = UDim2.fromScale(1, 1), ZIndex = 10, Parent = sq })
 	sqHit.InputBegan:Connect(function(input)
@@ -1352,7 +1278,6 @@ function Container:AddColorPicker(o)
 		if isPress(input) then sqDragging = false end
 	end)
 
-	-- Hue drag
 	local hDragging = false
 	local hHit = create("TextButton", { Size = UDim2.fromScale(1, 1), ZIndex = 10, Parent = hStrip })
 	hHit.InputBegan:Connect(function(input)
@@ -1370,18 +1295,16 @@ function Container:AddColorPicker(o)
 		if isPress(input) then hDragging = false end
 	end)
 
-	-- Hex input
 	hexBox.FocusLost:Connect(function()
 		local c = hexToColor(hexBox.Text)
 		if c then
 			h, s, v = rgbToHsv(c)
 			applyColor(true)
 		else
-			hexBox.Text = colorToHex(color)  -- revert bad input
+			hexBox.Text = colorToHex(color)
 		end
 	end)
 
-	-- ── open/close ───────────────────────────────────────────────────────────
 	local open = false
 	local function setOpen(val)
 		open = val
@@ -1405,10 +1328,6 @@ function Container:AddColorPicker(o)
 	}
 end
 
--- ── Keybind picker ────────────────────────────────────────────────────────────
--- tab:AddKeybind{ Text, Default = Enum.KeyCode.X, Callback }
--- Click the button to start listening; press any key to bind it.
--- Press Escape to cancel. Right-click the button to clear (sets Unknown).
 function Container:AddKeybind(o)
 	o = o or {}
 	local bound    = o.Default or Enum.KeyCode.Unknown
@@ -1431,8 +1350,8 @@ function Container:AddKeybind(o)
 		TextSize         = 13,
 		Parent           = card,
 	}, { corner(6), stroke(Theme.Stroke, 1, 0) })
-	local btnScale = create("UIScale", { Parent = btn })
-	local bdrStroke = btn:FindFirstChildWhichIsA("UIStroke")  -- the stroke we just made
+	local btnScale  = create("UIScale", { Parent = btn })
+	local bdrStroke = btn:FindFirstChildWhichIsA("UIStroke")
 
 	local hitCard = create("TextButton", { Size = UDim2.new(1, -150, 1, 0), ZIndex = 5, Parent = card })
 
@@ -1454,7 +1373,6 @@ function Container:AddKeybind(o)
 		if listening then stopListen() else startListen() end
 	end)
 	btn.MouseButton2Click:Connect(function()
-		-- right-click to clear
 		bound = Enum.KeyCode.Unknown
 		stopListen()
 		if o.Callback then task.spawn(o.Callback, bound) end
@@ -1463,7 +1381,6 @@ function Container:AddKeybind(o)
 	btn.MouseEnter:Connect(function() A(btnScale, "Scale", 1.04, P.Bouncy) end)
 	btn.MouseLeave:Connect(function() A(btnScale, "Scale", 1,    P.Snappy) end)
 
-	-- card hover
 	hitCard.MouseEnter:Connect(function()
 		A(card,  "BackgroundColor3", Theme.SurfaceHover, P.Snappy)
 		A(scale, "Scale",            1.01,               P.Bouncy)
@@ -1472,7 +1389,6 @@ function Container:AddKeybind(o)
 		A(card,  "BackgroundColor3", Theme.Surface, P.Snappy)
 		A(scale, "Scale",            1,             P.Snappy)
 	end)
-	-- clicking the card (not the btn) while not listening has no effect
 	hitCard.Activated:Connect(function() end)
 
 	self.Window:_connect(UserInputService.InputBegan, function(input, processed)
@@ -1498,7 +1414,6 @@ function Container:AddKeybind(o)
 	}
 end
 
--- ── Progress ──────────────────────────────────────────────────────────────────
 function Container:AddProgress(o)
 	o = o or {}
 	local card = self:_card(50)
@@ -1536,65 +1451,68 @@ function Container:AddProgress(o)
 end
 
 --------------------------------------------------------------------------------
--- Storage layer (writefile / ReplicatedStorage fallback)
+-- Storage layer (fixed: lazy hasFS, correct paths, explicit folder creation)
 --------------------------------------------------------------------------------
--- All persistence goes through these two functions. On executors that expose
--- writefile/readfile/isfile they use the filesystem; everywhere else they
--- store data as StringValues inside a folder tree in ReplicatedStorage so
--- the values survive as long as the game session does (not across sessions,
--- but they're always readable by other LocalScripts on the same client).
---
---   Nova.Storage.Save(namespace, key, json_string)
---   Nova.Storage.Load(namespace, key)  → string | nil
---   Nova.Storage.Folder  -- e.g.  "NovaUI/"  (filesystem prefix)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local HAS_FS = type(writefile) == "function"
-             and type(readfile) == "function"
-             and type(isfile)   == "function"
+-- Lazy eval: executor globals may not be injected at require-time
+local function hasFS()
+	return type(writefile) == "function"
+	    and type(readfile)  == "function"
+	    and type(isfile)    == "function"
+end
+
+local _folderReady = false
+local function ensureFolder(folder)
+	if _folderReady then return end
+	pcall(function()
+		if type(isfolder) == "function" and not isfolder(folder) then
+			if type(makefolder) == "function" then
+				makefolder(folder)
+			end
+		end
+	end)
+	_folderReady = true
+end
 
 local Storage = {}
 Nova.Storage  = Storage
 
-Storage.Folder = "NovaUI/"  -- filesystem folder prefix (no trailing slash needed separately)
+Storage.Folder = "NovaUI"   -- no trailing slash; joined below
 
--- Ensure the filesystem folder exists (some executors need makefolder)
-if HAS_FS then
-	pcall(function()
-		if type(makefolder) == "function" and not isfolder(Storage.Folder) then
-			makefolder(Storage.Folder)
-		end
-	end)
+local function fsPath(namespace, key)
+	return Storage.Folder .. "/" .. namespace .. "_" .. key .. ".json"
 end
 
--- Returns or creates the RS folder tree: ReplicatedStorage/NovaUI/<namespace>/
 local function getRSFolder(namespace)
 	local root = ReplicatedStorage:FindFirstChild("NovaUI")
 	if not root then
-		root = Instance.new("Folder")
-		root.Name = "NovaUI"
+		root        = Instance.new("Folder")
+		root.Name   = "NovaUI"
 		root.Parent = ReplicatedStorage
 	end
 	local ns = root:FindFirstChild(namespace)
 	if not ns then
-		ns = Instance.new("Folder")
-		ns.Name = namespace
+		ns        = Instance.new("Folder")
+		ns.Name   = namespace
 		ns.Parent = root
 	end
 	return ns
 end
 
 function Storage.Save(namespace, key, data)
-	-- data should be a JSON string
-	if HAS_FS then
-		local path = Storage.Folder .. namespace .. "_" .. key .. ".json"
-		pcall(writefile, path, data)
+	if hasFS() then
+		ensureFolder(Storage.Folder)
+		local ok, err = pcall(writefile, fsPath(namespace, key), data)
+		if not ok then
+			warn("[NovaUI] Storage.Save failed:", err)
+		end
 	else
 		local folder = getRSFolder(namespace)
-		local sv = folder:FindFirstChild(key)
+		local sv     = folder:FindFirstChild(key)
 		if not sv then
-			sv = Instance.new("StringValue")
+			sv        = Instance.new("StringValue")
 			sv.Name   = key
 			sv.Parent = folder
 		end
@@ -1603,22 +1521,28 @@ function Storage.Save(namespace, key, data)
 end
 
 function Storage.Load(namespace, key)
-	if HAS_FS then
-		local path = Storage.Folder .. namespace .. "_" .. key .. ".json"
+	if hasFS() then
+		local path = fsPath(namespace, key)
 		local ok, data = pcall(function()
 			if isfile(path) then return readfile(path) end
 			return nil
 		end)
-		return ok and data or nil
+		if not ok then
+			warn("[NovaUI] Storage.Load failed:", data)
+			return nil
+		end
+		return data
 	else
 		local folder = getRSFolder(namespace)
-		local sv = folder:FindFirstChild(key)
-		return sv and sv.Value ~= "" and sv.Value or nil
+		local sv     = folder:FindFirstChild(key)
+		return (sv and sv.Value ~= "") and sv.Value or nil
 	end
 end
 
--- Tiny JSON encoder/decoder for the simple types NovaUI needs
--- (numbers, booleans, strings, Color3 as hex, KeyCode as name, arrays, dicts)
+--------------------------------------------------------------------------------
+-- JSON encoder / decoder
+--------------------------------------------------------------------------------
+
 local JSON = {}
 
 local function jsonEncode(val)
@@ -1627,15 +1551,13 @@ local function jsonEncode(val)
 	elseif t == "boolean" then return val and "true" or "false"
 	elseif t == "number"  then return tostring(val)
 	elseif t == "string"  then
-		-- escape backslash, quote, newline
 		val = val:gsub('\\', '\\\\'):gsub('"', '\\"'):gsub('\n', '\\n')
 		return '"' .. val .. '"'
 	elseif t == "table" then
-		-- check if array
 		local isArr = (function()
-    		local count = 0
-    		for _ in val do count += 1 end
-    		return count > 0 and #val == count
+			local count = 0
+			for _ in val do count += 1 end
+			return count > 0 and #val == count
 		end)()
 		if isArr then
 			local parts = {}
@@ -1652,7 +1574,6 @@ local function jsonEncode(val)
 	return "null"
 end
 
--- Very small recursive descent parser – only handles what we write
 local function jsonDecode(s)
 	local pos = 1
 
@@ -1660,9 +1581,9 @@ local function jsonDecode(s)
 		while pos <= #s and s:sub(pos,pos):match("%s") do pos += 1 end
 	end
 
-	local parseVal  -- forward decl
+	local parseVal
 	local function parseStr()
-		pos += 1  -- skip opening "
+		pos += 1
 		local buf = {}
 		while pos <= #s do
 			local c = s:sub(pos, pos)
@@ -1700,7 +1621,7 @@ local function jsonDecode(s)
 		repeat
 			skip()
 			local k = parseStr(); skip()
-			pos += 1  -- ':'
+			pos += 1
 			skip()
 			obj[k] = parseVal(); skip()
 			local c = s:sub(pos,pos); pos += 1
@@ -1718,7 +1639,6 @@ local function jsonDecode(s)
 		elseif s:sub(pos, pos+4) == "false" then pos += 5; return false
 		elseif s:sub(pos, pos+3) == "null"  then pos += 4; return nil
 		else
-			-- number
 			local num = s:match("^-?%d+%.?%d*", pos)
 			if num then pos += #num; return tonumber(num) end
 		end
@@ -1730,9 +1650,8 @@ end
 
 JSON.encode = jsonEncode
 JSON.decode = jsonDecode
-Nova.JSON   = JSON  -- expose in case users want it
+Nova.JSON   = JSON
 
--- Value serialisers / deserialisers for component types
 local function serializeValue(val)
 	local t = typeof(val)
 	if t == "boolean" or t == "number" or t == "string" then
@@ -1741,7 +1660,7 @@ local function serializeValue(val)
 		return { __type = "Color3", hex = colorToHex(val) }
 	elseif t == "EnumItem" then
 		return { __type = "KeyCode", name = val.Name }
-	elseif t == "table" then  -- multi-dropdown array
+	elseif t == "table" then
 		return val
 	end
 	return nil
@@ -1754,17 +1673,16 @@ local function deserializeValue(raw)
 		elseif raw.__type == "KeyCode" then
 			return Enum.KeyCode[raw.name] or Enum.KeyCode.Unknown
 		else
-			return raw  -- plain array (multi-dropdown)
+			return raw
 		end
 	end
 	return raw
 end
 
 --------------------------------------------------------------------------------
--- Shared UI helper: mini action button row (reused by Config + Theme tabs)
+-- Shared action row helper
 --------------------------------------------------------------------------------
--- Returns nothing; populates `parent` frame with N equal-width gradient buttons.
--- btns = { { text, accentColor, callback }, ... }
+
 local function actionRow(parent, btns, cards)
 	create("UIListLayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
@@ -1780,10 +1698,10 @@ local function actionRow(parent, btns, cards)
 			Rotation = 20,
 		})
 		local face = create("Frame", {
-    		Size             = UDim2.new(1/n, if n > 1 then -math.ceil(6*(n-1)/n) else 0, 1, 0),
-    		BackgroundColor3 = Color3.new(1,1,1),
-    		LayoutOrder      = i,
-    		Parent           = parent,
+			Size             = UDim2.new(1/n, if n > 1 then -math.ceil(6*(n-1)/n) else 0, 1, 0),
+			BackgroundColor3 = Color3.new(1,1,1),
+			LayoutOrder      = i,
+			Parent           = parent,
 		}, { corner(7), grad })
 		create("TextLabel", {
 			Size       = UDim2.fromScale(1,1),
@@ -1807,40 +1725,19 @@ local function actionRow(parent, btns, cards)
 end
 
 --------------------------------------------------------------------------------
--- Config system  (multi-profile, game/global scope, selector, auto-load)
+-- Config system (fixed: auto-load fires on initial mount)
 --------------------------------------------------------------------------------
---[[
-  Mount with:   cfgTab:MountConfig()
 
-  Tag any component on any tab with Key = "..." to have it automatically
-  saved/loaded by the active config profile:
-    tab:AddToggle{ Text = "God Mode", Key = "godMode", Default = false, Callback = fn }
-
-  The GUI tab provides:
-    • Game / Global scope toggle (Game = per-PlaceId, Global = shared across games)
-    • Profile dropdown selector
-    • Profile name text input
-    • Save New, Overwrite, Load, Delete, Reset Defaults action buttons
-    • Auto-loads the last used profile on startup for each scope
-
-  To register a component manually (e.g. created outside a tab):
-    Nova._cfg:Register("myKey", component)
-  Nova._cfg always points to the currently active scope's Config instance.
-]]
-
--- Which Add* methods auto-register when Key is present
 local AUTO_REGISTER_METHODS = {
 	"AddToggle","AddSlider","AddTextInput","AddDropdown",
 	"AddMultiDropdown","AddColorPicker","AddKeybind",
 }
 
--- Auto-derived namespaces
 local NS_GAME   = "NovaConfig_" .. tostring(game.PlaceId)
 local NS_GLOBAL = "NovaConfig_Global"
 
 local Config = {}
 Config.__index = Config
--- Config is internal; use tab:MountConfig() for the GUI-driven workflow.
 
 local function _newConfig(namespace)
 	return setmetatable({
@@ -1849,19 +1746,13 @@ local function _newConfig(namespace)
 		_activeProfile = nil,
 	}, Config)
 end
--- Expose read-only access to the active config instance for manual Register calls.
--- Nova._cfg is set to the active scope's instance by MountConfig's scope toggle.
 
--- Two built-in instances (game-scoped and global)
 local _cfgGame   = _newConfig(NS_GAME)
 local _cfgGlobal = _newConfig(NS_GLOBAL)
 Nova._cfgGame   = _cfgGame
 Nova._cfgGlobal = _cfgGlobal
--- Nova._cfg points to whichever is currently active (starts as game)
-Nova._cfg = _cfgGame
+Nova._cfg       = _cfgGame
 
--- Patch Add* methods at module level so any tab's Key'd components are always registered,
--- regardless of whether MountConfig() has been called yet.
 for _, method in AUTO_REGISTER_METHODS do
 	local original = Container[method]
 	if original then
@@ -1874,8 +1765,6 @@ for _, method in AUTO_REGISTER_METHODS do
 		end
 	end
 end
-
--- ── internal helpers ──────────────────────────────────────────────────────────
 
 function Config:_getIndex()
 	local raw = Storage.Load(self._namespace, "_index")
@@ -1920,8 +1809,6 @@ function Config:_applyData(data)
 	end
 end
 
--- ── public API ────────────────────────────────────────────────────────────────
-
 function Config:SaveProfile(name)
 	name = (name ~= nil and tostring(name):match("^%s*(.-)%s*$")) or ""
 	if name == "" then
@@ -1953,19 +1840,21 @@ function Config:LoadProfile(name)
 end
 
 function Config:DeleteProfile(name)
-    pcall(function()
-        if HAS_FS then
-            local path = Storage.Folder .. self._namespace .. "_" .. name .. ".json"
-            if isfile(path) then delfile(path) end  -- delfile if your executor supports it
-        else
-            Storage.Save(self._namespace, name, "")  -- RS fallback unchanged
-        end
-    end)
-    self:_removeFromIndex(name)
-    if self._activeProfile == name then
-        self._activeProfile = nil
-        Storage.Save(self._namespace, "_active", JSON.encode(nil))
-    end
+	pcall(function()
+		if hasFS() then
+			local path = Storage.Folder .. "/" .. self._namespace .. "_" .. name .. ".json"
+			if type(isfile) == "function" and isfile(path) then
+				if type(delfile) == "function" then delfile(path) end
+			end
+		else
+			Storage.Save(self._namespace, name, "")
+		end
+	end)
+	self:_removeFromIndex(name)
+	if self._activeProfile == name then
+		self._activeProfile = nil
+		Storage.Save(self._namespace, "_active", JSON.encode(nil))
+	end
 end
 
 function Config:ResetDefaults()
@@ -1989,26 +1878,19 @@ function Config:AutoLoad()
 end
 
 function Nova.AutoLoadConfig()
-    task.defer(function()
-        local loaded = Nova._cfg:AutoLoad()
-        if loaded then
-            Nova.Notify{ Title="Config", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
-        end
-    end)
+	task.defer(function()
+		local loaded = Nova._cfg:AutoLoad()
+		if loaded then
+			Nova.Notify{ Title="Config", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
+		end
+	end)
 end
 
--- ── tab UI ────────────────────────────────────────────────────────────────────
-
--- Builds the profile-management UI section for whichever cfg is active.
--- Returns a refresh function so the Game/Global toggle can rebuild the list.
 local function buildConfigUI(tab, cfg, selectorComp, nameInput)
-	-- refresh the dropdown to this cfg's profile list
 	local idx = cfg:_getIndex()
 	selectorComp:SetOptions(idx)
 	selectorComp:Set(idx[1])
 
-	-- wire action rows to the new cfg
-	-- (row buttons close over `cfg` via the refresh, so we rebuild them)
 	local function overwrite()
 		local sel = selectorComp:Get()
 		if not sel then
@@ -2109,21 +1991,17 @@ local function buildConfigUI(tab, cfg, selectorComp, nameInput)
 	return overwrite, saveNew, load, delete, resetDefaults
 end
 
+-- Fixed MountConfig: activateScope extracted so auto-load fires on initial mount
 function Container:MountConfig()
 	local tab = self
 
-	-- ── Game / Global toggle ─────────────────────────────────────────────────
 	tab:AddSection("Config Scope")
-
 	local scopeRow = tab:_card(40, true)
-	local isGame   = true   -- current scope
 
-	-- These are filled after the profile UI is built below
 	local selectorComp, nameInput
 	local overwrite, saveNew, load, delete, resetDefaults
 
-	local function switchScope(toGame)
-		isGame  = toGame
+	local function activateScope(toGame)
 		Nova._cfg = toGame and _cfgGame or _cfgGlobal
 		overwrite, saveNew, load, delete, resetDefaults =
 			buildConfigUI(tab, Nova._cfg, selectorComp, nameInput)
@@ -2132,20 +2010,20 @@ function Container:MountConfig()
 			if loaded then
 				selectorComp:Set(loaded)
 				Nova.Notify{
-					Title = "Config",
-					Text  = 'Auto-loaded "'..loaded..'" ('..(toGame and "Game" or "Global")..')',
-					Type  = "info", Duration = 2,
+					Title    = "Config",
+					Text     = 'Auto-loaded "' .. loaded .. '" (' .. (toGame and "Game" or "Global") .. ')',
+					Type     = "info",
+					Duration = 2,
 				}
 			end
 		end)
 	end
 
 	actionRow(scopeRow, {
-		{ "🎮 Game",   Theme.Accent,    function() switchScope(true)  end },
-		{ "🌐 Global", Theme.AccentAlt, function() switchScope(false) end },
+		{ "🎮 Game",   Theme.Accent,    function() activateScope(true)  end },
+		{ "🌐 Global", Theme.AccentAlt, function() activateScope(false) end },
 	}, tab.Cards)
 
-	-- ── Profile selector + name input ────────────────────────────────────────
 	tab:AddSection("Profile")
 
 	local initProfiles = _cfgGame:_getIndex()
@@ -2160,13 +2038,12 @@ function Container:MountConfig()
 		Placeholder = "Enter name…",
 	}
 
-	-- ── Action rows ──────────────────────────────────────────────────────────
 	tab:AddSection("Actions")
 
 	local row1 = tab:_card(40, true)
 	actionRow(row1, {
-		{ "💾 Overwrite", Theme.Accent,   function() overwrite()     end },
-		{ "✨ Save New",  Theme.Success,  function() saveNew()       end },
+		{ "💾 Overwrite", Theme.Accent,  function() overwrite()     end },
+		{ "✨ Save New",  Theme.Success, function() saveNew()       end },
 	}, tab.Cards)
 
 	local row2 = tab:_card(40, true)
@@ -2179,28 +2056,13 @@ function Container:MountConfig()
 	tab:AddSection("Auto-Load")
 	tab:AddLabel("The last loaded/saved profile for each scope is restored automatically.")
 
-	-- Initialise callbacks and auto-load game scope
-	overwrite, saveNew, load, delete, resetDefaults =
-		buildConfigUI(tab, Nova._cfg, selectorComp, nameInput)
+	-- fires auto-load on first mount for game scope
+	activateScope(true)
 end
 
-
-
 --------------------------------------------------------------------------------
--- Theme system  (color pickers, presets, game/global scope, save/load/delete)
+-- Theme system (fixed: refreshThemeUI fires on initial mount)
 --------------------------------------------------------------------------------
---[[
-  Mount with:   themeTab:MountTheme()
-
-  The GUI tab provides:
-    • Toggle keybind picker (sets the window open/close key)
-    • Game / Global scope toggle (Game = per-PlaceId, Global = shared)
-    • Built-in preset buttons: Nova Dark, Midnight, Crimson, Ocean, Forest, Mono
-    • Live color pickers for every Theme key (changes apply instantly)
-    • Theme profile selector + name input
-    • Save New, Overwrite, Load, Delete action buttons
-    • Auto-loads the last used theme on startup for each scope
-]]
 
 local THEME_COLOR_KEYS = {
 	"Background","Surface","SurfaceHover","Stroke",
@@ -2208,7 +2070,6 @@ local THEME_COLOR_KEYS = {
 	"Success","Warning","Danger",
 }
 
--- Built-in presets
 local THEME_PRESETS = {
 	["Nova Dark"] = {
 		Background   = Color3.fromRGB(16, 16, 22),
@@ -2293,9 +2154,7 @@ local PRESET_ORDER = { "Nova Dark","Midnight","Crimson","Ocean","Forest","Mono" 
 
 local ThemeConfig = {}
 ThemeConfig.__index = ThemeConfig
--- ThemeConfig.new is internal; use tab:MountTheme() for the GUI-driven workflow.
 
--- Auto-derived namespaces
 local TNS_GAME   = "NovaTheme_" .. tostring(game.PlaceId)
 local TNS_GLOBAL = "NovaTheme_Global"
 
@@ -2307,14 +2166,11 @@ local function _newThemeConfig(namespace)
 	}, ThemeConfig)
 end
 
--- Two built-in instances
 local _themeGame   = _newThemeConfig(TNS_GAME)
 local _themeGlobal = _newThemeConfig(TNS_GLOBAL)
 Nova._themeGame   = _themeGame
 Nova._themeGlobal = _themeGlobal
-Nova._theme       = _themeGame   -- active instance
-
--- ── internal helpers ──────────────────────────────────────────────────────────
+Nova._theme       = _themeGame
 
 function ThemeConfig:_getIndex()
 	local raw = Storage.Load(self._namespace, "_index")
@@ -2366,8 +2222,6 @@ function ThemeConfig:_applyPalette(palette)
 	for k, v in overrides do Theme[k] = v end
 end
 
--- ── public API ────────────────────────────────────────────────────────────────
-
 function ThemeConfig:SaveProfile(name)
 	name = (name ~= nil and tostring(name):match("^%s*(.-)%s*$")) or ""
 	if name == "" then
@@ -2404,19 +2258,21 @@ function ThemeConfig:LoadProfile(name)
 end
 
 function ThemeConfig:DeleteProfile(name)
-    pcall(function()
-        if HAS_FS then
-            local path = Storage.Folder .. self._namespace .. "_" .. name .. ".json"
-            if isfile(path) then delfile(path) end
-        else
-            Storage.Save(self._namespace, name, "")
-        end
-    end)
-    self:_removeFromIndex(name)
-    if self._activeProfile == name then
-        self._activeProfile = nil
-        Storage.Save(self._namespace, "_active", JSON.encode(nil))
-    end
+	pcall(function()
+		if hasFS() then
+			local path = Storage.Folder .. "/" .. self._namespace .. "_" .. name .. ".json"
+			if type(isfile) == "function" and isfile(path) then
+				if type(delfile) == "function" then delfile(path) end
+			end
+		else
+			Storage.Save(self._namespace, name, "")
+		end
+	end)
+	self:_removeFromIndex(name)
+	if self._activeProfile == name then
+		self._activeProfile = nil
+		Storage.Save(self._namespace, "_active", JSON.encode(nil))
+	end
 end
 
 function ThemeConfig:ApplyPreset(presetName)
@@ -2435,21 +2291,19 @@ function ThemeConfig:AutoLoad()
 end
 
 function Nova.AutoLoadTheme()
-    task.defer(function()
-        local loaded = _themeGame:AutoLoad()
-        if loaded then
-            Nova.Notify{ Title="Theme", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
-        end
-    end)
+	task.defer(function()
+		local loaded = _themeGame:AutoLoad()
+		if loaded then
+			Nova.Notify{ Title="Theme", Text='Auto-loaded "'..loaded..'"', Type="info", Duration=2 }
+		end
+	end)
 end
 
--- ── tab UI ────────────────────────────────────────────────────────────────────
-
+-- Fixed MountTheme: refreshThemeUI fires on initial mount
 function Container:MountTheme()
 	local tab    = self
 	local window = self.Window
 
-	-- ── Toggle Keybind ───────────────────────────────────────────────────────
 	if window then
 		tab:AddSection("Toggle Keybind")
 		tab:AddLabel("Set the key used to open / close this window.")
@@ -2481,17 +2335,13 @@ function Container:MountTheme()
 		}
 	end
 
-	-- ── Game / Global toggle ─────────────────────────────────────────────────
 	tab:AddSection("Theme Scope")
-
 	local scopeRow = tab:_card(40, true)
 
-	-- selector and name input declared before use in switchScope
 	local selectorComp, nameInput
 
 	local function refreshThemeUI(tc)
 		Nova._theme = tc
-		-- share pickers with both instances so snapshots always reflect live state
 		_themeGame._pickers   = tc._pickers
 		_themeGlobal._pickers = tc._pickers
 		local idx = tc:_getIndex()
@@ -2511,7 +2361,6 @@ function Container:MountTheme()
 		{ "🌐 Global", Theme.AccentAlt, function() refreshThemeUI(_themeGlobal) end },
 	}, tab.Cards)
 
-	-- ── Presets ──────────────────────────────────────────────────────────────
 	tab:AddSection("Presets")
 	tab:AddLabel("Click a preset to apply it instantly. You can then customise and save.")
 
@@ -2519,7 +2368,7 @@ function Container:MountTheme()
 	for rowStart = 1, #PRESET_ORDER, presetsPerRow do
 		local rowBtns = {}
 		for i = rowStart, math.min(rowStart + presetsPerRow - 1, #PRESET_ORDER) do
-			local pname = PRESET_ORDER[i]
+			local pname  = PRESET_ORDER[i]
 			local accent = THEME_PRESETS[pname] and THEME_PRESETS[pname].Accent or Theme.Accent
 			table.insert(rowBtns, { pname, accent, function()
 				Nova._theme:ApplyPreset(pname)
@@ -2530,7 +2379,6 @@ function Container:MountTheme()
 		actionRow(row, rowBtns, tab.Cards)
 	end
 
-	-- ── Color pickers (shared across both scopes) ─────────────────────────────
 	tab:AddSection("Colors")
 	local pickers = {}
 	for _, key in THEME_COLOR_KEYS do
@@ -2544,11 +2392,9 @@ function Container:MountTheme()
 		}
 		pickers[key] = picker
 	end
-	-- give both instances the same picker table
 	_themeGame._pickers   = pickers
 	_themeGlobal._pickers = pickers
 
-	-- ── Saved themes ─────────────────────────────────────────────────────────
 	tab:AddSection("Saved Themes")
 
 	local initIdx = _themeGame:_getIndex()
@@ -2652,10 +2498,10 @@ function Container:MountTheme()
 
 	tab:AddSection("Auto-Load")
 	tab:AddLabel("The last loaded/saved theme for each scope is restored automatically.")
+
+	-- fires auto-load on first mount for game scope
+	refreshThemeUI(_themeGame)
 end
-
-
-
 
 --------------------------------------------------------------------------------
 -- Window
@@ -2695,23 +2541,19 @@ function Window:Toggle()
 end
 
 function Window:Minimize(state)
-    if state == nil then state = not self.Minimized end
-    self.Minimized = state
-    local h = state and 46 or self.Size.Y
-    A(self.Root, "Size", UDim2.fromOffset(self.Size.X, h), P.Smooth)
-    if self.Sidebar then
-        if state then
-            -- hide immediately as the window collapses
-            self.Sidebar.Visible = false
-        else
-            -- show before the expand animation plays
-            self.Sidebar.Visible = true
-        end
-    end
+	if state == nil then state = not self.Minimized end
+	self.Minimized = state
+	local h = state and 46 or self.Size.Y
+	A(self.Root, "Size", UDim2.fromOffset(self.Size.X, h), P.Smooth)
+	if self.Sidebar then
+		if state then
+			self.Sidebar.Visible = false
+		else
+			self.Sidebar.Visible = true
+		end
+	end
 end
 
--- Change the small text line shown under the player name in the sidebar.
--- Pass nil to restore the default (NovaUI version string).
 function Window:SetStatusText(text)
 	if self._statusLabel then
 		self._statusLabel.Text = text ~= nil and tostring(text) or ("NovaUI " .. Nova.Version)
@@ -2776,9 +2618,7 @@ function Window:AddTab(name, icon)
 		ClipsDescendants = true,
 		Parent           = self.TabList,
 	}, { corner(8), padding(14, 0, 8, 0) })
-	-- Show full name in tooltip only when text is actually being clipped
 	btn.MouseEnter:Connect(function()
-		-- TextBounds.X > btn.AbsoluteSize.X - padding means it's clipped
 		local textW = game:GetService("TextService"):GetTextSize(
 			fullText, 14, Theme.Font, Vector2.new(9999, 9999)
 		).X
@@ -2947,7 +2787,7 @@ function Nova.Window(o)
 	ctrl("–", -46, Theme.Warning,  function() self:Minimize() end)
 
 	local sidebar = create("Frame", {
-		Name   = "Sidebar",
+		Name     = "Sidebar",
 		Position = UDim2.fromOffset(0, 46),
 		Size     = UDim2.new(0, 150, 1, -46),
 		Parent   = main,
@@ -2979,8 +2819,6 @@ function Nova.Window(o)
 		Parent   = main,
 	})
 
-	-- ── Player profile card (bottom-right of sidebar) ───────────────────────
-	-- Height: 64px card pinned to the bottom of the sidebar
 	local PROFILE_H = 68
 	local profileCard = create("Frame", {
 		Name             = "ProfileCard",
@@ -2991,7 +2829,6 @@ function Nova.Window(o)
 		ZIndex           = 2,
 		Parent           = sidebar,
 	})
-	-- top divider
 	create("Frame", {
 		Size             = UDim2.new(1, 0, 0, 1),
 		BackgroundColor3 = Theme.Stroke,
@@ -2999,17 +2836,15 @@ function Nova.Window(o)
 		Parent           = profileCard,
 	})
 
-	-- Avatar image (36×36, pill)
 	local avatarImg = create("ImageLabel", {
 		AnchorPoint      = Vector2.new(0, 0.5),
-		Position         = UDim2.new(0, 10, 0.5, -6),   -- shift up a little for status text
+		Position         = UDim2.new(0, 10, 0.5, -6),
 		Size             = UDim2.fromOffset(34, 34),
 		BackgroundColor3 = Theme.Surface,
 		ZIndex           = 3,
 		Parent           = profileCard,
 	}, { pill(), stroke(Theme.Stroke, 1, 0.3) })
 
-	-- Display name label
 	local displayNameLabel = create("TextLabel", {
 		Position         = UDim2.new(0, 50, 0, 8),
 		Size             = UDim2.new(1, -54, 0, 18),
@@ -3023,7 +2858,6 @@ function Nova.Window(o)
 		Parent           = profileCard,
 	})
 
-	-- Status / custom text label  (win:SetStatusText changes this)
 	local statusLabel = create("TextLabel", {
 		Position         = UDim2.new(0, 50, 0, 28),
 		Size             = UDim2.new(1, -54, 0, 14),
@@ -3038,29 +2872,21 @@ function Nova.Window(o)
 	})
 	self._statusLabel = statusLabel
 
-	-- Tooltip hit area – shows Username + UserId
 	local profileHit = create("TextButton", {
 		Size   = UDim2.fromScale(1, 1),
 		ZIndex = 4,
 		Parent = profileCard,
 	})
 
-	-- Load avatar + fill labels asynchronously
 	task.spawn(function()
 		local lp = Players.LocalPlayer
 		if not lp then return end
-
-		-- Display name
 		local ok1, dn = pcall(function() return lp.DisplayName end)
 		displayNameLabel.Text = (ok1 and dn) or lp.Name
-
-		-- Tooltip
 		local uid = lp.UserId
 		local tooltipText = "@" .. lp.Name .. "  •  ID: " .. tostring(uid)
 		profileHit.MouseEnter:Connect(function() showTooltip(tooltipText) end)
 		profileHit.MouseLeave:Connect(hideTooltip)
-
-		-- Avatar thumbnail
 		local ok2, url = pcall(function()
 			return Players:GetUserThumbnailAsync(uid,
 				Enum.ThumbnailType.HeadShot,
@@ -3069,8 +2895,6 @@ function Nova.Window(o)
 		if ok2 and url then avatarImg.Image = url end
 	end)
 
-	-- Shrink TabList so it doesn't overlap the profile card
-	-- We resize it to leave PROFILE_H px at the bottom
 	self.TabList.Size = UDim2.new(1, 0, 1, -PROFILE_H)
 
 	local dragging, dragStart, startPos = false, nil, nil
@@ -3110,7 +2934,7 @@ function Nova.Window(o)
 end
 
 --------------------------------------------------------------------------------
--- Notifications (toasts)
+-- Notifications
 --------------------------------------------------------------------------------
 
 local holder
@@ -3197,7 +3021,7 @@ function Nova.Notify(o)
 end
 
 --------------------------------------------------------------------------------
--- Dialog (modal)
+-- Dialog
 --------------------------------------------------------------------------------
 
 function Nova.Dialog(o)

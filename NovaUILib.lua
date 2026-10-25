@@ -79,7 +79,7 @@ local TweenService = game:GetService("TweenService")
 local GuiService = game:GetService("GuiService")
 
 local Nova = {}
-Nova.Version = "1.4.0"
+Nova.Version = "1.4.3"
 
 --------------------------------------------------------------------------------
 -- Theme

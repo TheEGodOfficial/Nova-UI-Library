@@ -124,23 +124,23 @@ local stepConn
 
 local function encode(v)
 	local t = typeof(v)
-	if t == "number"  then return { v } end
-	if t == "Color3"  then return { v.R, v.G, v.B } end
-	if t == "UDim2"   then return { v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset } end
+	if t == "number" then return { v } end
+	if t == "Color3" then return { v.R, v.G, v.B } end
+	if t == "UDim2" then return { v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset } end
 	if t == "Vector2" then return { v.X, v.Y } end
-	if t == "UDim"    then return { v.Scale, v.Offset } end
+	if t == "UDim" then return { v.Scale, v.Offset } end
 	error("NovaUI: cannot animate value of type " .. t)
 end
 
 local function decode(kind, a, prop)
-	if kind == "number"  then
+	if kind == "number" then
 		if string.find(prop, "Transparency") then return math.clamp(a[1], 0, 1) end
 		return a[1]
 	end
-	if kind == "Color3"  then return Color3.new(math.clamp(a[1],0,1), math.clamp(a[2],0,1), math.clamp(a[3],0,1)) end
-	if kind == "UDim2"   then return UDim2.new(a[1], a[2], a[3], a[4]) end
+	if kind == "Color3" then return Color3.new(math.clamp(a[1],0,1), math.clamp(a[2],0,1), math.clamp(a[3],0,1)) end
+	if kind == "UDim2" then return UDim2.new(a[1], a[2], a[3], a[4]) end
 	if kind == "Vector2" then return Vector2.new(a[1], a[2]) end
-	if kind == "UDim"    then return UDim.new(a[1], a[2]) end
+	if kind == "UDim" then return UDim.new(a[1], a[2]) end
 end
 
 local function stepAll(dt)
@@ -194,7 +194,7 @@ function Nova.Animate(inst, prop, target, speed, damping)
 	local s = props[prop]
 	if s and s.kind == kind then
 		s.tgt = tgt
-		s.speed = speed  or s.speed
+		s.speed = speed or s.speed
 		s.damping= damping or s.damping
 	else
 		local cur = encode(inst[prop])
@@ -295,7 +295,7 @@ local function hoverable(btn, target, scaleObj, normalColor, hoverColor, hoverSc
 		A(scaleObj, "Scale", 1, P.Snappy)
 	end)
 	btn.MouseButton1Down:Connect(function() A(scaleObj, "Scale", 0.96, P.Snappy) end)
-	btn.MouseButton1Up:Connect(function()   A(scaleObj, "Scale", hoverScale, P.Bouncy) end)
+	btn.MouseButton1Up:Connect(function() A(scaleObj, "Scale", hoverScale, P.Bouncy) end)
 end
 
 local function ripple(face, input)
@@ -326,7 +326,7 @@ local function hsvToRgb(h, s, v)
 	local t = v * (1 - s * (1 - f))
 	local r, g, b
 	i = i % 6
-	if     i == 0 then r,g,b = v,t,p
+	if i == 0 then r,g,b = v,t,p
 	elseif i == 1 then r,g,b = q,v,p
 	elseif i == 2 then r,g,b = p,v,t
 	elseif i == 3 then r,g,b = p,q,v
@@ -343,9 +343,9 @@ local function rgbToHsv(c)
 	local d = max - min
 	local h, s, v = 0, (max == 0 and 0 or d/max), max
 	if d ~= 0 then
-		if     max == r then h = (g - b) / d % 6
+		if max == r then h = (g - b) / d % 6
 		elseif max == g then h = (b - r) / d + 2
-		else                 h = (r - g) / d + 4
+		else h = (r - g) / d + 4
 		end
 		h = h / 6
 	end
@@ -421,7 +421,7 @@ end
 
 local function hideTooltip()
 	if tooltipFrame then tooltipFrame.Visible = false end
-	if tooltipConn  then tooltipConn:Disconnect(); tooltipConn = nil end
+	if tooltipConn then tooltipConn:Disconnect(); tooltipConn = nil end
 end
 
 local function withTooltip(hoverObject, text)
@@ -491,12 +491,12 @@ end
 
 local function cardHover(card, hit, scale)
 	hit.MouseEnter:Connect(function()
-		A(card,  "BackgroundColor3", Theme.SurfaceHover, P.Snappy)
-		A(scale, "Scale",            1.01,               P.Bouncy)
+		A(card, "BackgroundColor3", Theme.SurfaceHover, P.Snappy)
+		A(scale, "Scale", 1.01, P.Bouncy)
 	end)
 	hit.MouseLeave:Connect(function()
-		A(card,  "BackgroundColor3", Theme.Surface, P.Snappy)
-		A(scale, "Scale",            1,             P.Snappy)
+		A(card, "BackgroundColor3", Theme.Surface, P.Snappy)
+		A(scale, "Scale", 1, P.Snappy)
 	end)
 end
 
@@ -566,15 +566,15 @@ function Container:AddButton(o)
 	})
 
 	hit.MouseEnter:Connect(function()
-		A(scale, "Scale",   1.02, P.Bouncy)
-		A(grad,  "Rotation", 110, { 10, 1 })
+		A(scale, "Scale", 1.02, P.Bouncy)
+		A(grad, "Rotation", 110, { 10, 1 })
 	end)
 	hit.MouseLeave:Connect(function()
-		A(scale, "Scale",    1,  P.Snappy)
-		A(grad,  "Rotation", 20, { 10, 1 })
+		A(scale, "Scale", 1, P.Snappy)
+		A(grad, "Rotation", 20, { 10, 1 })
 	end)
 	hit.MouseButton1Down:Connect(function() A(scale, "Scale", 0.96, P.Snappy) end)
-	hit.MouseButton1Up:Connect(function()   A(scale, "Scale", 1.02, P.Bouncy) end)
+	hit.MouseButton1Up:Connect(function() A(scale, "Scale", 1.02, P.Bouncy) end)
 	hit.InputBegan:Connect(function(input)
 		if isPress(input) then ripple(face, input) end
 	end)
@@ -620,8 +620,8 @@ function Container:AddToggle(o)
 	local function render(instant)
 		local w = pressed and 24 or 18
 		local x = state and (44 - 3 - w) or 3
-		put(knob,  "Size",             UDim2.fromOffset(w, 18),      P.Snappy, instant)
-		put(knob,  "Position",         UDim2.new(0, x, 0.5, 0),      P.Bouncy, instant)
+		put(knob, "Size", UDim2.fromOffset(w, 18), P.Snappy, instant)
+		put(knob, "Position", UDim2.new(0, x, 0.5, 0), P.Bouncy, instant)
 		put(track, "BackgroundColor3", state and Theme.Accent or Theme.Stroke, P.Snappy, instant)
 	end
 	render(true)
@@ -633,7 +633,7 @@ function Container:AddToggle(o)
 	end
 
 	cardHover(card, hit, scale)
-	hit.MouseButton1Down:Connect(function() pressed = true;  render(false) end)
+	hit.MouseButton1Down:Connect(function() pressed = true; render(false) end)
 	local function release()
 		if pressed then pressed = false; render(false) end
 	end
@@ -643,7 +643,7 @@ function Container:AddToggle(o)
 
 	return {
 		Frame = card,
-		Get = function()    return state end,
+		Get = function() return state end,
 		Set = function(_, v) set(v == true, true) end,
 	}
 end
@@ -728,7 +728,7 @@ function Container:AddSlider(o)
 
 	return {
 		Frame = card,
-		Get = function()     return value end,
+		Get = function() return value end,
 		Set = function(_, v) setValue(v, true) end,
 	}
 end
@@ -759,18 +759,18 @@ function Container:AddTextInput(o)
 	local boxScale = create("UIScale", { Parent = box })
 
 	box.Focused:Connect(function()
-		A(border,   "Color",     Theme.Accent, P.Snappy)
-		A(border,   "Thickness", 2,            P.Snappy)
-		A(boxScale, "Scale",     1.04,         P.Bouncy)
+		A(border, "Color", Theme.Accent, P.Snappy)
+		A(border, "Thickness", 2, P.Snappy)
+		A(boxScale, "Scale", 1.04, P.Bouncy)
 	end)
 	box.FocusLost:Connect(function(enter)
-		A(border,   "Color",     Theme.Stroke, P.Snappy)
-		A(border,   "Thickness", 1,            P.Snappy)
-		A(boxScale, "Scale",     1,            P.Snappy)
+		A(border, "Color", Theme.Stroke, P.Snappy)
+		A(border, "Thickness", 1, P.Snappy)
+		A(boxScale, "Scale", 1, P.Snappy)
 		if o.Callback then task.spawn(o.Callback, box.Text, enter) end
 	end)
 	box.MouseEnter:Connect(function() A(scale, "Scale", 1.01, P.Bouncy) end)
-	box.MouseLeave:Connect(function() A(scale, "Scale", 1,    P.Snappy) end)
+	box.MouseLeave:Connect(function() A(scale, "Scale", 1, P.Snappy) end)
 
 	return {
 		Frame = card,
@@ -828,8 +828,8 @@ function Container:AddDropdown(o)
 
 	local function setOpen(v)
 		open = v
-		A(card,    "Size",       UDim2.new(1, 0, 0, v and (HEAD + listHeight() + 8) or HEAD), P.Snappy)
-		A(chevron, "Rotation",   v and 180 or 0,                    P.Bouncy)
+		A(card, "Size", UDim2.new(1, 0, 0, v and (HEAD + listHeight() + 8) or HEAD), P.Snappy)
+		A(chevron, "Rotation", v and 180 or 0, P.Bouncy)
 		A(chevron, "TextColor3", v and Theme.Accent or Theme.SubText, P.Snappy)
 	end
 
@@ -862,8 +862,8 @@ function Container:AddDropdown(o)
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Parent = list,
 			}, { corner(6), padding(10, 0, 0, 0) })
-			b.MouseEnter:Connect(function()  A(b, "BackgroundTransparency", 0, P.Snappy) end)
-			b.MouseLeave:Connect(function()  A(b, "BackgroundTransparency", 1, P.Snappy) end)
+			b.MouseEnter:Connect(function() A(b, "BackgroundTransparency", 0, P.Snappy) end)
+			b.MouseLeave:Connect(function() A(b, "BackgroundTransparency", 1, P.Snappy) end)
 			b.Activated:Connect(function()
 				choose(opt, true)
 				setOpen(false)
@@ -888,8 +888,8 @@ function Container:AddDropdown(o)
 			TextXAlignment = Enum.TextXAlignment.Left,
 			Parent = list,
 		}, { corner(6), padding(10, 0, 0, 0) })
-		b.MouseEnter:Connect(function()  A(b, "BackgroundTransparency", 0, P.Snappy) end)
-		b.MouseLeave:Connect(function()  A(b, "BackgroundTransparency", 1, P.Snappy) end)
+		b.MouseEnter:Connect(function() A(b, "BackgroundTransparency", 0, P.Snappy) end)
+		b.MouseLeave:Connect(function() A(b, "BackgroundTransparency", 1, P.Snappy) end)
 		b.Activated:Connect(function()
 			choose(opt, true)
 			setOpen(false)
@@ -1017,9 +1017,9 @@ function Container:AddMultiDropdown(o)
 
 	local function setOpen(v)
 		open = v
-		A(card,    "Size",       UDim2.new(1, 0, 0, v and (HEAD + listHeight() + 8) or HEAD), P.Snappy)
-		A(chevron, "Rotation",   v and 180 or 0,                     P.Bouncy)
-		A(chevron, "TextColor3", v and Theme.Accent or Theme.SubText,  P.Snappy)
+		A(card, "Size", UDim2.new(1, 0, 0, v and (HEAD + listHeight() + 8) or HEAD), P.Snappy)
+		A(chevron, "Rotation", v and 180 or 0, P.Bouncy)
+		A(chevron, "TextColor3", v and Theme.Accent or Theme.SubText, P.Snappy)
 	end
 
 	local function rebuild()
@@ -1060,13 +1060,13 @@ function Container:AddMultiDropdown(o)
 			})
 			tick.Visible = isOn
 
-			b.MouseEnter:Connect(function()  A(b, "BackgroundTransparency", 0, P.Snappy) end)
-			b.MouseLeave:Connect(function()  A(b, "BackgroundTransparency", 1, P.Snappy) end)
+			b.MouseEnter:Connect(function() A(b, "BackgroundTransparency", 0, P.Snappy) end)
+			b.MouseLeave:Connect(function() A(b, "BackgroundTransparency", 1, P.Snappy) end)
 			b.Activated:Connect(function()
 				if selected[opt] then
 					selected[opt] = nil
-					A(chk,  "BackgroundColor3", Theme.Stroke, P.Snappy)
-					A(b,    "TextColor3",       Theme.Text,   P.Snappy)
+					A(chk, "BackgroundColor3", Theme.Stroke, P.Snappy)
+					A(b, "TextColor3", Theme.Text, P.Snappy)
 					tick.Visible = false
 				else
 					if maxSel then
@@ -1075,8 +1075,8 @@ function Container:AddMultiDropdown(o)
 						if count >= maxSel then return end
 					end
 					selected[opt] = true
-					A(chk,  "BackgroundColor3", Theme.Accent, P.Snappy)
-					A(b,    "TextColor3",       Theme.Accent, P.Snappy)
+					A(chk, "BackgroundColor3", Theme.Accent, P.Snappy)
+					A(b, "TextColor3", Theme.Accent, P.Snappy)
 					tick.Visible = true
 				end
 				updateLabel()
@@ -1222,13 +1222,13 @@ function Container:AddColorPicker(o)
 	local hGrad = create("UIGradient", {
 		Rotation = 90,
 		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0,    Color3.fromHSV(0,   1, 1)),
-			ColorSequenceKeypoint.new(1/6,  Color3.fromHSV(1/6, 1, 1)),
-			ColorSequenceKeypoint.new(2/6,  Color3.fromHSV(2/6, 1, 1)),
-			ColorSequenceKeypoint.new(3/6,  Color3.fromHSV(3/6, 1, 1)),
-			ColorSequenceKeypoint.new(4/6,  Color3.fromHSV(4/6, 1, 1)),
-			ColorSequenceKeypoint.new(5/6,  Color3.fromHSV(5/6, 1, 1)),
-			ColorSequenceKeypoint.new(1,    Color3.fromHSV(1,   1, 1)),
+			ColorSequenceKeypoint.new(0, Color3.fromHSV(0, 1, 1)),
+			ColorSequenceKeypoint.new(1/6, Color3.fromHSV(1/6, 1, 1)),
+			ColorSequenceKeypoint.new(2/6, Color3.fromHSV(2/6, 1, 1)),
+			ColorSequenceKeypoint.new(3/6, Color3.fromHSV(3/6, 1, 1)),
+			ColorSequenceKeypoint.new(4/6, Color3.fromHSV(4/6, 1, 1)),
+			ColorSequenceKeypoint.new(5/6, Color3.fromHSV(5/6, 1, 1)),
+			ColorSequenceKeypoint.new(1, Color3.fromHSV(1, 1, 1)),
 		}),
 		Parent = hStrip,
 	})
@@ -1271,7 +1271,7 @@ function Container:AddColorPicker(o)
 	end)
 	self.Window:_connect(UserInputService.InputChanged, function(input)
 		if sqDragging and (input.UserInputType == Enum.UserInputType.MouseMovement
-		               or  input.UserInputType == Enum.UserInputType.Touch) then
+		               or input.UserInputType == Enum.UserInputType.Touch) then
 			local rel = (Vector2.new(input.Position.X, input.Position.Y) - sq.AbsolutePosition) / sq.AbsoluteSize
 			s = math.clamp(rel.X, 0, 1)
 			v = 1 - math.clamp(rel.Y, 0, 1)
@@ -1289,7 +1289,7 @@ function Container:AddColorPicker(o)
 	end)
 	self.Window:_connect(UserInputService.InputChanged, function(input)
 		if hDragging and (input.UserInputType == Enum.UserInputType.MouseMovement
-		               or  input.UserInputType == Enum.UserInputType.Touch) then
+		               or input.UserInputType == Enum.UserInputType.Touch) then
 			local rel = (input.Position.Y - hStrip.AbsolutePosition.Y) / hStrip.AbsoluteSize.Y
 			h = math.clamp(rel, 0, 1)
 			applyColor(true)
@@ -1312,9 +1312,9 @@ function Container:AddColorPicker(o)
 	local open = false
 	local function setOpen(val)
 		open = val
-		A(card,    "Size",       UDim2.new(1, 0, 0, val and EXPANDED or HEAD), P.Snappy)
-		A(chevron, "Rotation",   val and 180 or 0,                              P.Bouncy)
-		A(chevron, "TextColor3", val and Theme.Accent or Theme.SubText,         P.Snappy)
+		A(card, "Size", UDim2.new(1, 0, 0, val and EXPANDED or HEAD), P.Snappy)
+		A(chevron, "Rotation", val and 180 or 0, P.Bouncy)
+		A(chevron, "TextColor3", val and Theme.Accent or Theme.SubText, P.Snappy)
 		body.Visible = val
 	end
 	body.Visible = false
@@ -1369,7 +1369,7 @@ function Container:AddKeybind(o)
 	local function startListen()
 		listening = true
 		btn.Text = "…"
-		A(bdrStroke, "Color",     Theme.Accent, P.Snappy)
+		A(bdrStroke, "Color", Theme.Accent, P.Snappy)
 		A(btn, "BackgroundColor3", Theme.SurfaceHover, P.Snappy)
 	end
 
@@ -1383,15 +1383,15 @@ function Container:AddKeybind(o)
 	end)
 
 	btn.MouseEnter:Connect(function() A(btnScale, "Scale", 1.04, P.Bouncy) end)
-	btn.MouseLeave:Connect(function() A(btnScale, "Scale", 1,    P.Snappy) end)
+	btn.MouseLeave:Connect(function() A(btnScale, "Scale", 1, P.Snappy) end)
 
 	hitCard.MouseEnter:Connect(function()
-		A(card,  "BackgroundColor3", Theme.SurfaceHover, P.Snappy)
-		A(scale, "Scale",            1.01,               P.Bouncy)
+		A(card, "BackgroundColor3", Theme.SurfaceHover, P.Snappy)
+		A(scale, "Scale", 1.01, P.Bouncy)
 	end)
 	hitCard.MouseLeave:Connect(function()
-		A(card,  "BackgroundColor3", Theme.Surface, P.Snappy)
-		A(scale, "Scale",            1,             P.Snappy)
+		A(card, "BackgroundColor3", Theme.Surface, P.Snappy)
+		A(scale, "Scale", 1, P.Snappy)
 	end)
 	hitCard.Activated:Connect(function() end)
 
@@ -1463,8 +1463,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Lazy eval: executor globals may not be injected at require-time
 local function hasFS()
 	return type(writefile) == "function"
-	    and type(readfile)  == "function"
-	    and type(isfile)    == "function"
+	    and type(readfile) == "function"
+	    and type(isfile) == "function"
 end
 
 local _folderReady = {}
@@ -1483,7 +1483,7 @@ end
 local Storage = {}
 Nova.Storage = Storage
 
-Storage.Folder = "NovaUI"   -- no trailing slash; joined below
+Storage.Folder = "NovaUI" -- no trailing slash; joined below
 
 local function fsPath(namespace, key)
 	return Storage.Folder .. "/" .. namespace .. "_" .. key .. ".json"
@@ -1551,10 +1551,10 @@ local JSON = {}
 
 local function jsonEncode(val)
 	local t = type(val)
-	if t == "nil"     then return "null"
+	if t == "nil" then return "null"
 	elseif t == "boolean" then return val and "true" or "false"
-	elseif t == "number"  then return tostring(val)
-	elseif t == "string"  then
+	elseif t == "number" then return tostring(val)
+	elseif t == "string" then
 		val = val:gsub('\\', '\\\\'):gsub('"', '\\"'):gsub('\n', '\\n')
 		return '"' .. val .. '"'
 	elseif t == "table" then
@@ -1595,9 +1595,9 @@ local function jsonDecode(s)
 			if c == '\\' then
 				pos += 1
 				local e = s:sub(pos, pos)
-				if     e == '"'  then buf[#buf+1] = '"'
+				if e == '"' then buf[#buf+1] = '"'
 				elseif e == '\\' then buf[#buf+1] = '\\'
-				elseif e == 'n'  then buf[#buf+1] = '\n'
+				elseif e == 'n' then buf[#buf+1] = '\n'
 				else buf[#buf+1] = e end
 			else
 				buf[#buf+1] = c
@@ -1639,9 +1639,9 @@ local function jsonDecode(s)
 		if c == '"' then return parseStr()
 		elseif c == '[' then return parseArr()
 		elseif c == '{' then return parseObj()
-		elseif s:sub(pos, pos+3) == "true"  then pos += 4; return true
+		elseif s:sub(pos, pos+3) == "true" then pos += 4; return true
 		elseif s:sub(pos, pos+4) == "false" then pos += 5; return false
-		elseif s:sub(pos, pos+3) == "null"  then pos += 4; return nil
+		elseif s:sub(pos, pos+3) == "null" then pos += 4; return nil
 		else
 			local num = s:match("^-?%d+%.?%d*", pos)
 			if num then pos += #num; return tonumber(num) end
@@ -1720,15 +1720,15 @@ local function actionRow(parent, btns, cards)
 		if cards then table.insert(cards, sc) end
 		local hit = create("TextButton", { Size = UDim2.fromScale(1,1), ZIndex = 5, Parent = face })
 		hit.MouseEnter:Connect(function()
-			A(sc,   "Scale",    1.04, P.Bouncy)
-			A(grad, "Rotation", 110,  { 10, 1 })
+			A(sc, "Scale", 1.04, P.Bouncy)
+			A(grad, "Rotation", 110, { 10, 1 })
 		end)
 		hit.MouseLeave:Connect(function()
-			A(sc,   "Scale",    1,   P.Snappy)
-			A(grad, "Rotation", 20,  { 10, 1 })
+			A(sc, "Scale", 1, P.Snappy)
+			A(grad, "Rotation", 20, { 10, 1 })
 		end)
 		hit.MouseButton1Down:Connect(function() A(sc, "Scale", 0.94, P.Snappy) end)
-		hit.MouseButton1Up:Connect(function()   A(sc, "Scale", 1.04, P.Bouncy) end)
+		hit.MouseButton1Up:Connect(function() A(sc, "Scale", 1.04, P.Bouncy) end)
 		hit.InputBegan:Connect(function(inp) if isPress(inp) then ripple(face, inp) end end)
 		hit.Activated:Connect(function() task.spawn(b[3]) end)
 	end
@@ -2030,7 +2030,7 @@ function Container:MountConfig()
 	end
 
 	actionRow(scopeRow, {
-		{ "🎮 Game",   Theme.Accent,    function() activateScope(true)  end },
+		{ "🎮 Game", Theme.Accent, function() activateScope(true) end },
 		{ "🌐 Global", Theme.AccentAlt, function() activateScope(false) end },
 	}, tab.Cards)
 
@@ -2052,15 +2052,15 @@ function Container:MountConfig()
 
 	local row1 = tab:_card(40, true)
 	actionRow(row1, {
-		{ "💾 Overwrite", Theme.Accent,  function() overwrite()     end },
-		{ "✨ Save New",  Theme.Success, function() saveNew()       end },
+		{ "💾 Overwrite", Theme.Accent, function() overwrite() end },
+		{ "✨ Save New", Theme.Success, function() saveNew() end },
 	}, tab.Cards)
 
 	local row2 = tab:_card(40, true)
 	actionRow(row2, {
-		{ "📂 Load",     Theme.AccentAlt, function() load()          end },
-		{ "🗑 Delete",   Theme.Danger,    function() delete()        end },
-		{ "↺ Defaults", Theme.Warning,   function() resetDefaults() end },
+		{ "📂 Load", Theme.AccentAlt, function() load() end },
+		{ "🗑 Delete", Theme.Danger, function() delete() end },
+		{ "↺ Defaults", Theme.Warning, function() resetDefaults() end },
 	}, tab.Cards)
 
 	tab:AddSection("Auto-Load")
@@ -2343,7 +2343,7 @@ function Container:MountTheme()
 					Title = "Keybind",
 					Text = key == Enum.KeyCode.Unknown
 						and "Toggle keybind cleared."
-						or  'Toggle set to "'..key.Name..'"',
+						or 'Toggle set to "'..key.Name..'"',
 					Type = "info", Duration = 2,
 				}
 			end,
@@ -2372,7 +2372,7 @@ function Container:MountTheme()
 	end
 
 	actionRow(scopeRow, {
-		{ "🎮 Game",   Theme.Accent,    function() refreshThemeUI(_themeGame)   end },
+		{ "🎮 Game", Theme.Accent, function() refreshThemeUI(_themeGame) end },
 		{ "🌐 Global", Theme.AccentAlt, function() refreshThemeUI(_themeGlobal) end },
 	}, tab.Cards)
 
@@ -2535,17 +2535,17 @@ function Window:Open()
 	if self.Opened then return end
 	self.Opened = true
 	self.Root.Visible = true
-	A(self.Main,      "GroupTransparency", 0,                     P.Smooth)
-	A(self.Main,      "Position",          UDim2.fromOffset(0, 0), P.Smooth)
-	A(self.OpenScale, "Scale",             1,                      P.Bouncy)
+	A(self.Main, "GroupTransparency", 0, P.Smooth)
+	A(self.Main, "Position", UDim2.fromOffset(0, 0), P.Smooth)
+	A(self.OpenScale, "Scale", 1, P.Bouncy)
 end
 
 function Window:Close()
 	if not self.Opened then return end
 	self.Opened = false
-	A(self.Main,      "GroupTransparency", 1,                      P.Snappy)
-	A(self.Main,      "Position",          UDim2.fromOffset(0, 24), P.Snappy)
-	A(self.OpenScale, "Scale",             0.88,                    P.Snappy)
+	A(self.Main, "GroupTransparency", 1, P.Snappy)
+	A(self.Main, "Position", UDim2.fromOffset(0, 24), P.Snappy)
+	A(self.OpenScale, "Scale", 0.88, P.Snappy)
 	task.delay(0.3, function()
 		if not self.Opened and self.Root.Parent then self.Root.Visible = false end
 	end)
@@ -2578,7 +2578,7 @@ end
 function Window:SetTitle(title, subtitle)
 	local sub = subtitle
 		and ("  <font size=\"12\" color=\"" .. rgbString(Theme.SubText) .. "\">" .. subtitle .. "</font>")
-		or  ""
+		or ""
 	self.TitleLabel.Text = title .. sub
 end
 
@@ -2591,13 +2591,13 @@ function Window:SelectTab(tab)
 
 	for _, t in self.Tabs do
 		local active = t == tab
-		A(t.Button, "BackgroundTransparency", active and 0  or 1,          P.Snappy)
-		A(t.Button, "TextColor3",             active and Theme.Text or Theme.SubText, P.Snappy)
+		A(t.Button, "BackgroundTransparency", active and 0 or 1, P.Snappy)
+		A(t.Button, "TextColor3", active and Theme.Text or Theme.SubText, P.Snappy)
 	end
 
 	if old then
-		A(old.Page, "GroupTransparency", 1,                      P.Snappy)
-		A(old.Page, "Position",          UDim2.fromOffset(-24, 0), P.Snappy)
+		A(old.Page, "GroupTransparency", 1, P.Snappy)
+		A(old.Page, "Position", UDim2.fromOffset(-24, 0), P.Snappy)
 		task.delay(0.25, function()
 			if self.Current ~= old then old.Page.Visible = false end
 		end)
@@ -2606,8 +2606,8 @@ function Window:SelectTab(tab)
 	local page = tab.Page
 	page.Visible = true
 	Nova.Snap(page, "Position", UDim2.fromOffset(24, 0))
-	A(page, "Position",          UDim2.fromOffset(0, 0), P.Smooth)
-	A(page, "GroupTransparency", 0,                      P.Smooth)
+	A(page, "Position", UDim2.fromOffset(0, 0), P.Smooth)
+	A(page, "GroupTransparency", 0, P.Smooth)
 
 	for i, sc in tab.Cards do
 		Nova.Snap(sc, "Scale", 0.92)
@@ -2669,14 +2669,14 @@ function Window:AddTab(name, icon)
 
 	btn.MouseEnter:Connect(function()
 		if self.Current ~= tab then
-			A(btn, "BackgroundTransparency", 0.6,        P.Snappy)
-			A(btn, "TextColor3",             Theme.Text,  P.Snappy)
+			A(btn, "BackgroundTransparency", 0.6, P.Snappy)
+			A(btn, "TextColor3", Theme.Text, P.Snappy)
 		end
 	end)
 	btn.MouseLeave:Connect(function()
 		if self.Current ~= tab then
-			A(btn, "BackgroundTransparency", 1,            P.Snappy)
-			A(btn, "TextColor3",             Theme.SubText, P.Snappy)
+			A(btn, "BackgroundTransparency", 1, P.Snappy)
+			A(btn, "TextColor3", Theme.SubText, P.Snappy)
 		end
 	end)
 	btn.Activated:Connect(function() self:SelectTab(tab) end)
@@ -2737,9 +2737,9 @@ function Nova.Window(o)
 	border.Parent = main
 	local borderGrad = create("UIGradient", {
 		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0,   Theme.Accent),
+			ColorSequenceKeypoint.new(0, Theme.Accent),
 			ColorSequenceKeypoint.new(0.5, Theme.AccentAlt),
-			ColorSequenceKeypoint.new(1,   Theme.Accent),
+			ColorSequenceKeypoint.new(1, Theme.Accent),
 		}),
 		Parent = border,
 	})
@@ -2786,20 +2786,20 @@ function Nova.Window(o)
 		}, { corner(8) })
 		local s = create("UIScale", { Parent = b })
 		b.MouseEnter:Connect(function()
-			A(b, "BackgroundTransparency", 0,          P.Snappy)
-			A(b, "TextColor3",             hoverColor,  P.Snappy)
-			A(s, "Scale",                  1.1,         P.Bouncy)
+			A(b, "BackgroundTransparency", 0, P.Snappy)
+			A(b, "TextColor3", hoverColor, P.Snappy)
+			A(s, "Scale", 1.1, P.Bouncy)
 		end)
 		b.MouseLeave:Connect(function()
-			A(b, "BackgroundTransparency", 1,             P.Snappy)
-			A(b, "TextColor3",             Theme.SubText,  P.Snappy)
-			A(s, "Scale",                  1,              P.Snappy)
+			A(b, "BackgroundTransparency", 1, P.Snappy)
+			A(b, "TextColor3", Theme.SubText, P.Snappy)
+			A(s, "Scale", 1, P.Snappy)
 		end)
 		b.MouseButton1Down:Connect(function() A(s, "Scale", 0.88, P.Snappy) end)
 		b.Activated:Connect(cb)
 	end
-	ctrl("×", -12, Theme.Danger,   function() self:Close() end)
-	ctrl("–", -46, Theme.Warning,  function() self:Minimize() end)
+	ctrl("×", -12, Theme.Danger, function() self:Close() end)
+	ctrl("–", -46, Theme.Warning, function() self:Minimize() end)
 
 	local sidebar = create("Frame", {
 		Name = "Sidebar",
@@ -3016,17 +3016,17 @@ function Nova.Notify(o)
 	local function dismiss()
 		if closed then return end
 		closed = true
-		A(card, "Position",          UDim2.fromOffset(340, 0), P.Snappy)
-		A(card, "GroupTransparency", 1,                        P.Snappy)
+		A(card, "Position", UDim2.fromOffset(340, 0), P.Snappy)
+		A(card, "GroupTransparency", 1, P.Snappy)
 		task.delay(0.12, function()
 			if wrap.Parent then A(wrap, "Size", UDim2.new(1, 0, 0, 0), P.Smooth) end
 		end)
 		task.delay(0.7, function() wrap:Destroy() end)
 	end
 
-	A(wrap, "Size",             UDim2.new(1, 0, 0, H), P.Bouncy)
-	A(card, "Position",          UDim2.fromOffset(0, 0),  P.Bouncy)
-	A(card, "GroupTransparency", 0,                        P.Smooth)
+	A(wrap, "Size", UDim2.new(1, 0, 0, H), P.Bouncy)
+	A(card, "Position", UDim2.fromOffset(0, 0), P.Bouncy)
+	A(card, "GroupTransparency", 0, P.Smooth)
 
 	TweenService:Create(bar, TweenInfo.new(duration, Enum.EasingStyle.Linear), { Size = UDim2.new(0, 0, 0, 2) }):Play()
 	task.delay(duration, dismiss)
@@ -3089,9 +3089,9 @@ function Nova.Dialog(o)
 	local function close()
 		if closing then return end
 		closing = true
-		A(dim,  "BackgroundTransparency", 1,    P.Smooth)
-		A(card, "GroupTransparency",      1,    P.Snappy)
-		A(sc,   "Scale",                  0.9,  P.Snappy)
+		A(dim, "BackgroundTransparency", 1, P.Smooth)
+		A(card, "GroupTransparency", 1, P.Snappy)
+		A(sc, "Scale", 0.9, P.Snappy)
 		task.delay(0.4, function() gui:Destroy() end)
 	end
 
@@ -3116,9 +3116,9 @@ function Nova.Dialog(o)
 
 	if o.Dismissible ~= false then dim.Activated:Connect(close) end
 
-	A(dim,  "BackgroundTransparency", 0.45, P.Smooth)
-	A(card, "GroupTransparency",      0,    P.Smooth)
-	A(sc,   "Scale",                  1,    P.Bouncy)
+	A(dim, "BackgroundTransparency", 0.45, P.Smooth)
+	A(card, "GroupTransparency", 0, P.Smooth)
+	A(sc, "Scale", 1, P.Bouncy)
 
 	return { Close = close }
 end
